@@ -1013,10 +1013,10 @@
         }
 
         function calculateBlockAccuracy() {
-            const validTrials = state.currentBlockData.filter(t => t.accuracy !== null);
-            if (validTrials.length === 0) return 0;
-            const correct = validTrials.filter(t => t.accuracy === 1).length;
-            return correct / validTrials.length;
+            if (state.currentBlockData.length === 0) return 0;
+
+            const correct = state.currentBlockData.filter(t => t.accuracy === 1).length;
+            return correct / state.currentBlockData.length;
         }
 
         function calculateMeanRT() {
