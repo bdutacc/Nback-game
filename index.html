@@ -1187,27 +1187,8 @@
             showScreen('screen-submission');
             statusDiv.style.display = 'block';
             resultDiv.style.display = 'none';
-    
-            // 10 saniye timeout ekle
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
-    
-            try {
-                const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(blockStats),
-                    signal: controller.signal // Timeout için eklendi
-                });
-        
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) throw new Error('HTTP error: ' + response.status);
-        
-        const result = await response.json();
             
+            // ÖNCE blockStats hazırla
             const blockStats = {
                 participant_id: state.participantId,
                 session_id: state.sessionId,
@@ -1223,14 +1204,25 @@
                 trials: state.currentBlockData
             };
             
+            // 10 saniye timeout ekle
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            
             try {
                 const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(blockStats)
+                    body: JSON.stringify(blockStats),
+                    signal: controller.signal
                 });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error('HTTP error: ' + response.status);
+                }
                 
                 const result = await response.json();
                 
@@ -1257,23 +1249,28 @@
                         document.getElementById('btn-new-session').style.display = 'block';
                     }
                 } else {
-                    throw new Error('Server reported failure');
+                    throw new Error(result.error || 'Server reported failure');
                 }
             } catch (error) {
+                clearTimeout(timeoutId);
                 console.error('Submission error:', error);
-                if (!sessionFinished) {
-                    statusDiv.style.display = 'none';
-                    resultDiv.style.display = 'block';
-                    resultDiv.innerHTML = `
-                        <div class="stats-box">
-                            <h3 class="warning">⚠ Submission Failed</h3>
-                            <p>Data is saved locally and CSV was downloaded.</p>
-                            <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">
-                                Error: ${error.message}
-                            </p>
-                        </div>
-                    `;
-                    document.getElementById('btn-new-session').style.display = 'block';
+                
+                statusDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `
+                    <div class="stats-box">
+                        <h3 class="warning">⚠ Connection Issue</h3>
+                        <p>Could not connect to server, but your data is safe!</p>
+                        <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">
+                            Error: ${error.message}<br>
+                            CSV file downloaded to your device.
+                        </p>
+                    </div>
+                `;
+                document.getElementById('btn-new-session').style.display = 'block';
+                
+                if (sessionFinished) {
+                    clearStorage();
                 }
             }
         }
