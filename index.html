@@ -1185,6 +1185,28 @@
             const resultDiv = document.getElementById('submission-result');
             
             showScreen('screen-submission');
+            statusDiv.style.display = 'block';
+            resultDiv.style.display = 'none';
+    
+            // 10 saniye timeout ekle
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+    
+            try {
+                const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(blockStats),
+                    signal: controller.signal // Timeout için eklendi
+                });
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) throw new Error('HTTP error: ' + response.status);
+        
+        const result = await response.json();
             
             const blockStats = {
                 participant_id: state.participantId,
