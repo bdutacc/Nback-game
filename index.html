@@ -120,6 +120,15 @@
             border: 2px solid #fff;
         }
         
+        .btn-end-session {
+            background: #8E8E93;
+            font-size: 0.9rem;
+            padding: 12px;
+            margin-bottom: 15px;
+            width: auto;
+            display: inline-block;
+        }
+        
         .btn-skip {
             background: #666;
             font-size: 1rem;
@@ -137,6 +146,14 @@
         .btn-large {
             padding: 30px 20px;
             font-size: 1.5rem;
+        }
+        
+        .difficulty-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 400px;
+            width: 100%;
         }
         
         #stimulus-display {
@@ -273,6 +290,7 @@
         
         .center-content {
             justify-content: center;
+            align-items: center;
         }
         
         .info-text {
@@ -329,14 +347,6 @@
             color: #fff;
         }
         
-        .difficulty-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            max-width: 400px;
-            width: 100%;
-        }
-        
         .recovery-box {
             background: #2a2a2a;
             border: 2px solid #FF9500;
@@ -370,6 +380,11 @@
             border-radius: 12px;
             font-size: 0.7rem;
             margin-left: 10px;
+        }
+        
+        .end-session-container {
+            text-align: center;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -420,24 +435,20 @@
             <div class="step-dot"></div>
             <div class="step-dot"></div>
         </div>
-        <p class="step-label">Step 2: Choose N-Back Level (1-4)</p>
+        <p class="step-label">Step 2: Choose N-Back Level (2-4)</p>
         <p>Choose the n-back level for the next block:</p>
         <div class="difficulty-grid">
-            <button class="btn btn-secondary" onclick="startPracticePhase(1)">
-                1-Back<br>
-                <small style="font-weight: normal; opacity: 0.8;">Match previous letter</small>
-            </button>
             <button class="btn btn-secondary" onclick="startPracticePhase(2)">
                 2-Back<br>
-                <small style="font-weight: normal; opacity: 0.8;">2 trials ago</small>
+                <small style="font-weight: normal; opacity: 0.8;">Match letter from 2 trials ago</small>
             </button>
             <button class="btn btn-secondary" onclick="startPracticePhase(3)">
                 3-Back<br>
-                <small style="font-weight: normal; opacity: 0.8;">3 trials ago</small>
+                <small style="font-weight: normal; opacity: 0.8;">Match letter from 3 trials ago</small>
             </button>
             <button class="btn btn-secondary" onclick="startPracticePhase(4)">
                 4-Back<br>
-                <small style="font-weight: normal; opacity: 0.8;">4 trials ago</small>
+                <small style="font-weight: normal; opacity: 0.8;">Match letter from 4 trials ago</small>
             </button>
         </div>
         <div id="completed-blocks" style="margin-top: 20px; font-size: 0.9rem; color: #aaa;"></div>
@@ -471,6 +482,12 @@
             <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
         </div>
         <div class="timer-display" id="timer-display">00:00</div>
+        
+        <!-- END SESSION BUTTON - Always visible during task -->
+        <div class="end-session-container">
+            <button class="btn btn-end-session" onclick="confirmEndSessionDuringTask()">🛑 End Session (Save & Exit)</button>
+        </div>
+        
         <div style="text-align: center; margin-bottom: 10px; color: #888; font-size: 0.9rem;">
             <span id="phase-badge" class="phase-badge phase-practice">PRACTICE</span><br>
             <span id="difficulty-label">2-Back</span> | 
@@ -565,14 +582,17 @@
     <!-- Feedback Overlay -->
     <div id="feedback" class="feedback"></div>
 
-    <a href="#" class="admin-link" onclick="showAdmin(); return false;">Admin</a>
+    <!-- Admin Link - Updated with your script URL -->
+    <a href="https://script.google.com/macros/s/AKfycbwvQrEHGVvcelZgcU5vT6xCZiYOXJf2OS_o5tu8f5rn1g1pjC4_znMLiT5pibXQTsq0ag/exec?password=nbackadmin2024" 
+       class="admin-link" 
+       target="_blank">Admin</a>
 
     <script>
         // ==========================================
-        // CONFIGURATION
+        // CONFIGURATION - YOUR SCRIPT URL
         // ==========================================
         const CONFIG = {
-            GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec',
+            GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwvQrEHGVvcelZgcU5vT6xCZiYOXJf2OS_o5tu8f5rn1g1pjC4_znMLiT5pibXQTsq0ag/exec',
             PRACTICE_TRIALS: 12,
             REAL_TRIALS: 120,
             TRIAL_DURATION: 2000,
@@ -606,11 +626,11 @@
             breakStartTime: 0,
             breakDuration: 0,
             currentPhase: 'idle',
-            completedBlocks: [] // Track completed blocks with their difficulties
+            completedBlocks: []
         };
 
         // ==========================================
-        // LOCAL STORAGE KEYS
+        // LOCAL STORAGE
         // ==========================================
         function getStorageKey() {
             return `nback_recovery_${state.participantId}`;
@@ -643,26 +663,17 @@
         function loadStateFromStorage(pid) {
             const key = `nback_recovery_${pid}`;
             const data = localStorage.getItem(key);
-            if (data) {
-                return JSON.parse(data);
-            }
-            return null;
+            return data ? JSON.parse(data) : null;
         }
 
         function clearStorage() {
             if (state.participantId) {
                 localStorage.removeItem(getStorageKey());
             }
-            for (let i = localStorage.length - 1; i >= 0; i--) {
-                const key = localStorage.key(i);
-                if (key && key.startsWith('nback_')) {
-                    localStorage.removeItem(key);
-                }
-            }
         }
 
         // ==========================================
-        // SESSION RECOVERY
+        // SESSION MANAGEMENT
         // ==========================================
         function checkForExistingSession() {
             const pid = document.getElementById('participant-id').value.trim();
@@ -696,19 +707,7 @@
                 return;
             }
             
-            state.participantId = savedData.participantId;
-            state.sessionId = savedData.sessionId;
-            state.blockNumber = savedData.blockNumber;
-            state.globalTrialNumber = savedData.globalTrialNumber;
-            state.currentDifficulty = savedData.currentDifficulty;
-            state.isPractice = savedData.isPractice;
-            state.currentBlockData = savedData.currentBlockData || [];
-            state.currentTrial = savedData.currentTrial || 0;
-            state.sequence = savedData.sequence || [];
-            state.isTarget = savedData.isTarget || [];
-            state.blockStartTime = savedData.blockStartTime || Date.now();
-            state.currentPhase = savedData.currentPhase || 'idle';
-            state.completedBlocks = savedData.completedBlocks || [];
+            Object.assign(state, savedData);
             
             if (state.currentPhase === 'practice' || state.currentPhase === 'real') {
                 document.getElementById('phase-badge').textContent = state.isPractice ? 'PRACTICE' : 'BLOCK ' + state.blockNumber;
@@ -753,7 +752,7 @@
             if (state.completedBlocks.length === 0) {
                 div.innerHTML = 'No blocks completed yet';
             } else {
-                let html = 'Completed blocks: ';
+                let html = 'Completed: ';
                 state.completedBlocks.forEach((block, idx) => {
                     html += `<span style="color: #34C759;">${block.difficulty}-Back</span>`;
                     if (idx < state.completedBlocks.length - 1) html += ', ';
@@ -768,7 +767,7 @@
         }
 
         // ==========================================
-        // PRACTICE PHASE
+        // TASK FLOW
         // ==========================================
         function startPracticePhase(n) {
             state.currentDifficulty = n;
@@ -804,9 +803,6 @@
             showTransitionScreen();
         }
 
-        // ==========================================
-        // TRANSITION & REAL BLOCK
-        // ==========================================
         function showTransitionScreen() {
             state.currentPhase = 'transition';
             saveStateToStorage();
@@ -850,13 +846,41 @@
         }
 
         // ==========================================
-        // SEQUENCE GENERATION (Supports 1-4)
+        // END SESSION DURING TASK (NEW FEATURE)
+        // ==========================================
+        function confirmEndSessionDuringTask() {
+            if (confirm('Are you sure you want to end this session?\n\nCurrent progress will be saved and emailed.')) {
+                // Stop all timers
+                state.timeoutIds.forEach(id => clearTimeout(id));
+                state.timeoutIds = [];
+                
+                // Mark session as finished
+                state.currentPhase = 'finished';
+                
+                // If we have collected any data in this block, save it
+                if (state.currentBlockData.length > 0) {
+                    // Add metadata that session was ended early
+                    state.currentBlockData.forEach(trial => {
+                        trial.session_ended_early = true;
+                    });
+                    
+                    saveDataLocally();
+                    submitBlockData(true); // true = session finished
+                } else {
+                    // No data collected, just show complete screen
+                    showScreen('screen-complete');
+                    clearStorage();
+                }
+            }
+        }
+
+        // ==========================================
+        // SEQUENCE GENERATION (2-4 only)
         // ==========================================
         function generateSequence(n, length) {
             const seq = [];
             const targets = [];
             
-            // First n trials: never targets
             for (let i = 0; i < n; i++) {
                 seq.push(CONFIG.LETTERS[Math.floor(Math.random() * CONFIG.LETTERS.length)]);
                 targets.push(false);
@@ -886,7 +910,7 @@
         }
 
         // ==========================================
-        // TIMER
+        // TIMER & TRIALS
         // ==========================================
         function updateTimer() {
             if (!document.getElementById('screen-task').classList.contains('active')) return;
@@ -907,9 +931,6 @@
             }
         }
 
-        // ==========================================
-        // TRIAL LOGIC
-        // ==========================================
         function runTrialLoop() {
             if (state.currentTrial >= state.sequence.length) {
                 endBlock();
@@ -1055,7 +1076,6 @@
             state.currentPhase = 'break';
             state.breakStartTime = Date.now();
             
-            // Record completed block
             state.completedBlocks.push({
                 blockNumber: state.blockNumber,
                 difficulty: state.currentDifficulty,
@@ -1120,7 +1140,7 @@
                 state.currentBlockData[state.currentBlockData.length - 1].session_finished = true;
             }
             
-            submitBlockData(true); // true = session is finished
+            submitBlockData(true);
         }
 
         // ==========================================
@@ -1237,68 +1257,11 @@
         }
 
         // ==========================================
-        // UTILITY FUNCTIONS
+        // UTILITIES
         // ==========================================
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
-        }
-
-        function showAdmin() {
-            const password = prompt('Enter admin password:');
-            if (password === 'nbackadmin2024') {
-                viewLocalStorage();
-            }
-        }
-
-        function viewLocalStorage() {
-            let html = '<h2>Local Backup Data</h2>';
-            let hasData = false;
-            
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && key.startsWith('nback_')) {
-                    hasData = true;
-                    try {
-                        const data = JSON.parse(localStorage.getItem(key));
-                        const trialCount = Array.isArray(data) ? data.length : (data.currentBlockData ? data.currentBlockData.length : 'N/A');
-                        html += `<div style="margin: 10px 0; padding: 10px; background: #333; border-radius: 8px;">
-                            <strong>${key}</strong> (${trialCount} trials)
-                            <button onclick="downloadSpecificData('${key}')" style="margin-left: 10px;">Download</button>
-                            <button onclick="deleteSpecificData('${key}')" style="margin-left: 5px; background: #FF3B30;">Delete</button>
-                        </div>`;
-                    } catch(e) {
-                        html += `<div style="margin: 10px 0; padding: 10px; background: #333; border-radius: 8px;">
-                            <strong>${key}</strong> (corrupted data)
-                        </div>`;
-                    }
-                }
-            }
-            if (!hasData) html += '<p>No local data found.</p>';
-            
-            const div = document.createElement('div');
-            div.innerHTML = html + '<button onclick="this.parentElement.remove()" style="margin-top: 20px; width: 100%; padding: 15px;">Close</button>';
-            div.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#1a1a1a;z-index:1000;overflow:auto;padding:20px;';
-            document.body.appendChild(div);
-        }
-
-        function downloadSpecificData(key) {
-            const data = JSON.parse(localStorage.getItem(key));
-            const trials = Array.isArray(data) ? data : (data.currentBlockData || []);
-            const csv = convertToCSV(trials);
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = key + '.csv';
-            a.click();
-        }
-
-        function deleteSpecificData(key) {
-            if (confirm('Delete this data?')) {
-                localStorage.removeItem(key);
-                viewLocalStorage();
-            }
         }
 
         // Mobile optimizations
