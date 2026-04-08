@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>N-Back Task</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Screen Management */
+        .screen {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            padding: 20px;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .screen.active {
+            display: flex;
+        }
+        
+        /* Typography */
+        h1 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        h2 {
+            font-size: 1.3rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        p {
+            font-size: 1rem;
+            line-height: 1.5;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 1rem;
+        }
+        
+        /* Inputs */
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 2px solid #444;
+            border-radius: 12px;
+            background: #2a2a2a;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 1rem;
+            -webkit-appearance: none;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #007AFF;
+        }
+        
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            background: #007AFF;
+            color: white;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: transform 0.1s, opacity 0.2s;
+            -webkit-touch-callout: none;
+            user-select: none;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+        
+        .btn-secondary {
+            background: #5856D6;
+        }
+        
+        .btn-success {
+            background: #34C759;
+        }
+        
+        .btn-danger {
+            background: #FF3B30;
+        }
+        
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: auto;
+            margin-bottom: 20px;
+        }
+        
+        .btn-large {
+            padding: 30px 20px;
+            font-size: 1.5rem;
+        }
+        
+        /* Task Specific Styles */
+        #stimulus-display {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+            font-weight: bold;
+            min-height: 200px;
+        }
+        
+        .fixation {
+            color: #666;
+            font-size: 4rem !important;
+        }
+        
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: bold;
+            padding: 20px 40px;
+            border-radius: 12px;
+            z-index: 100;
+            display: none;
+        }
+        
+        .feedback.correct {
+            background: rgba(52, 199, 89, 0.9);
+            display: block;
+        }
+        
+        .feedback.incorrect {
+            background: rgba(255, 59, 48, 0.9);
+            display: block;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: #007AFF;
+            transition: width 0.2s;
+        }
+        
+        /* Stats Display */
+        .stats-box {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 10px 0;
+            text-align: left;
+        }
+        
+        .stats-box h3 {
+            margin-top: 0;
+            color: #007AFF;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 0.95rem;
+        }
+        
+        /* Utility */
+        .hidden {
+            display: none !important;
+        }
+        
+        .center-content {
+            justify-content: center;
+        }
+        
+        .info-text {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-size: 0.95rem;
+        }
+        
+        .warning {
+            color: #FF9500;
+            font-weight: 600;
+        }
+        
+        .success {
+            color: #34C759;
+        }
+        
+        .error {
+            color: #FF3B30;
+        }
+        
+        /* Admin Panel Link */
+        .admin-link {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 0.7rem;
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Screen 1: Participant ID Entry -->
+    <div id="screen-id" class="screen active center-content">
+        <h1>N-Back Task</h1>
+        <p>Please enter your Participant ID:</p>
+        <input type="text" id="participant-id" placeholder="e.g., P001" maxlength="20">
+        <button class="btn btn-success" onclick="startSession()">Start Session</button>
+        <div style="margin-top: 30px; font-size: 0.85rem; color: #888;">
+            <p style="font-size: 0.8rem;">This task works best when you hold your phone in portrait mode.</p>
+        </div>
+    </div>
+
+    <!-- Screen 2: Difficulty Selection -->
+    <div id="screen-difficulty" class="screen center-content">
+        <h1>Select Difficulty</h1>
+        <p>Choose the n-back level for the next block:</p>
+        <div style="max-width: 400px; width: 100%;">
+            <button class="btn btn-secondary" onclick="startPractice(2)">
+                2-Back<br>
+                <small style="font-weight: normal; opacity: 0.8;">Match letter from 2 trials ago</small>
+            </button>
+            <button class="btn btn-secondary" onclick="startPractice(3)">
+                3-Back<br>
+                <small style="font-weight: normal; opacity: 0.8;">Match letter from 3 trials ago</small>
+            </button>
+            <button class="btn btn-secondary" onclick="startPractice(4)">
+                4-Back<br>
+                <small style="font-weight: normal; opacity: 0.8;">Match letter from 4 trials ago</small>
+            </button>
+        </div>
+        <div id="block-info" style="margin-top: 20px; font-size: 0.9rem; color: #aaa;"></div>
+    </div>
+
+    <!-- Screen 3: Practice Instructions -->
+    <div id="screen-practice-instructions" class="screen center-content">
+        <h1>Practice Block</h1>
+        <div class="info-text">
+            <p><strong>Instructions:</strong></p>
+            <p>Press <strong>MATCH</strong> if the current letter matches the letter shown <span id="practice-n-level">2</span> trials ago.</p>
+            <p>Press <strong>NO MATCH</strong> if it is different.</p>
+            <p class="warning">You will receive feedback during practice.</p>
+        </div>
+        <button class="btn btn-success" onclick="startPracticeTrials()">Start Practice (12 trials)</button>
+    </div>
+
+    <!-- Screen 4: Task Screen (Practice & Real) -->
+    <div id="screen-task" class="screen">
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+        </div>
+        <div style="text-align: center; margin-bottom: 10px; color: #888; font-size: 0.9rem;">
+            <span id="block-type-label">Practice</span> | 
+            <span id="difficulty-label">2-Back</span> | 
+            Trial <span id="trial-counter">0</span>/<span id="total-trials">12</span>
+        </div>
+        
+        <div id="stimulus-display" class="fixation">+</div>
+        
+        <div class="btn-grid">
+            <button class="btn btn-danger btn-large" id="btn-no-match" ontouchstart="handleResponse(false)" onclick="handleResponse(false)">
+                NO MATCH<br>
+                <small>Different</small>
+            </button>
+            <button class="btn btn-success btn-large" id="btn-match" ontouchstart="handleResponse(true)" onclick="handleResponse(true)">
+                MATCH<br>
+                <small>Same</small>
+            </button>
+        </div>
+    </div>
+
+    <!-- Screen 5: Break Screen -->
+    <div id="screen-break" class="screen center-content">
+        <h1>Block Complete!</h1>
+        <div class="stats-box">
+            <h3>Block Summary</h3>
+            <div class="stat-row"><span>Difficulty:</span><span id="break-difficulty">-</span></div>
+            <div class="stat-row"><span>Accuracy:</span><span id="break-accuracy">-</span></div>
+            <div class="stat-row"><span>Mean RT:</span><span id="break-rt">-</span></div>
+            <div class="stat-row"><span>Trials:</span><span id="break-trials">-</span></div>
+        </div>
+        <p>Take a break. When ready, continue to the next block.</p>
+        <button class="btn btn-success" onclick="returnToDifficulty()">Continue</button>
+    </div>
+
+    <!-- Screen 6: Data Submission -->
+    <div id="screen-submission" class="screen center-content">
+        <h1>Saving Results</h1>
+        <div id="submission-status">
+            <p>Submitting data...</p>
+            <div class="progress-container" style="margin-top: 20px;">
+                <div class="progress-bar" style="width: 50%; animation: pulse 1s infinite;"></div>
+            </div>
+        </div>
+        <div id="submission-result" style="display: none; width: 100%; max-width: 400px;"></div>
+        <button class="btn" id="btn-new-session" style="display: none; margin-top: 20px;" onclick="location.reload()">New Session</button>
+    </div>
+
+    <!-- Feedback Overlay -->
+    <div id="feedback" class="feedback"></div>
+
+    <a href="#" class="admin-link" onclick="showAdmin(); return false;">Admin</a>
+
+    <script>
+        // ==========================================
+        // CONFIGURATION
+        // ==========================================
+        const CONFIG = {
+            GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/https://script.googleusercontent.com/macros/echo?user_content_key=AWDtjMXoCcHM-rNQ4ATf0hCe12qbMzR5BgNcwiU_nVBwkdbTEYfq2WME8S23K/exec', // Replace this!
+            PRACTICE_TRIALS: 12,
+            REAL_TRIALS: 120,
+            TRIAL_DURATION: 2000, // ms
+            FIXATION_DURATION: 500, // ms
+            STIMULUS_DURATION: 1000, // ms
+            RESPONSE_WINDOW: 500, // ms after stimulus onset
+            TARGET_PROBABILITY: 0.3,
+            LETTERS: ['B', 'F', 'H', 'K', 'M', 'Q', 'R', 'X']
+        };
+
+        // ==========================================
+        // STATE MANAGEMENT
+        // ==========================================
+        let state = {
+            participantId: '',
+            sessionId: '',
+            blockNumber: 0,
+            globalTrialNumber: 0,
+            currentDifficulty: 2,
+            isPractice: false,
+            currentBlockData: [],
+            trialStartTime: 0,
+            stimulusOnsetTime: 0,
+            currentTrial: 0,
+            sequence: [],
+            isTarget: [],
+            canRespond: false,
+            responded: false,
+            timeoutIds: []
+        };
+
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        function generateSessionId() {
+            return 'SES_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function startSession() {
+            const pid = document.getElementById('participant-id').value.trim();
+            if (!pid) {
+                alert('Please enter a Participant ID');
+                return;
+            }
+            state.participantId = pid;
+            state.sessionId = generateSessionId();
+            showScreen('screen-difficulty');
+            updateBlockInfo();
+        }
+
+        function updateBlockInfo() {
+            document.getElementById('block-info').innerHTML = 
+                `Participant: <strong>${state.participantId}</strong><br>
+                 Session: ${state.sessionId.substr(-6)}<br>
+                 Completed Blocks: ${state.blockNumber}`;
+        }
+
+        // ==========================================
+        // SEQUENCE GENERATION
+        // ==========================================
+        function generateSequence(n, length) {
+            const seq = [];
+            const targets = [];
+            
+            // First n trials: never targets
+            for (let i = 0; i < n; i++) {
+                seq.push(CONFIG.LETTERS[Math.floor(Math.random() * CONFIG.LETTERS.length)]);
+                targets.push(false);
+            }
+            
+            // Generate remaining trials with ~30% targets
+            let targetCount = 0;
+            const targetGoal = Math.floor((length - n) * CONFIG.TARGET_PROBABILITY);
+            
+            for (let i = n; i < length; i++) {
+                const shouldBeTarget = (targetCount < targetGoal) && (Math.random() < 0.5);
+                
+                if (shouldBeTarget && !targets[i-1]) { // Avoid consecutive targets
+                    seq.push(seq[i - n]); // Match n-back
+                    targets.push(true);
+                    targetCount++;
+                } else {
+                    // Random non-matching letter
+                    let letter;
+                    do {
+                        letter = CONFIG.LETTERS[Math.floor(Math.random() * CONFIG.LETTERS.length)];
+                    } while (letter === seq[i - n]);
+                    seq.push(letter);
+                    targets.push(false);
+                }
+            }
+            
+            return { sequence: seq, isTarget: targets };
+        }
+
+        // ==========================================
+        // PRACTICE BLOCK
+        // ==========================================
+        function startPractice(n) {
+            state.currentDifficulty = n;
+            document.getElementById('practice-n-level').textContent = n;
+            showScreen('screen-practice-instructions');
+        }
+
+        function startPracticeTrials() {
+            state.isPractice = true;
+            state.currentBlockData = [];
+            state.currentTrial = 0;
+            
+            const seqData = generateSequence(state.currentDifficulty, CONFIG.PRACTICE_TRIALS);
+            state.sequence = seqData.sequence;
+            state.isTarget = seqData.isTarget;
+            
+            document.getElementById('block-type-label').textContent = 'Practice';
+            document.getElementById('difficulty-label').textContent = state.currentDifficulty + '-Back';
+            document.getElementById('total-trials').textContent = CONFIG.PRACTICE_TRIALS;
+            
+            showScreen('screen-task');
+            runTrialLoop();
+        }
+
+        // ==========================================
+        // REAL BLOCK
+        // ==========================================
+        function startRealBlock() {
+            state.blockNumber++;
+            state.isPractice = false;
+            state.currentBlockData = [];
+            state.currentTrial = 0;
+            
+            const seqData = generateSequence(state.currentDifficulty, CONFIG.REAL_TRIALS);
+            state.sequence = seqData.sequence;
+            state.isTarget = seqData.isTarget;
+            
+            document.getElementById('block-type-label').textContent = 'Block ' + state.blockNumber;
+            document.getElementById('difficulty-label').textContent = state.currentDifficulty + '-Back';
+            document.getElementById('total-trials').textContent = CONFIG.REAL_TRIALS;
+            
+            showScreen('screen-task');
+            runTrialLoop();
+        }
+
+        // ==========================================
+        // TRIAL LOGIC
+        // ==========================================
+        function runTrialLoop() {
+            if (state.currentTrial >= state.sequence.length) {
+                endBlock();
+                return;
+            }
+            
+            const trialIndex = state.currentTrial;
+            const totalTrials = state.isPractice ? CONFIG.PRACTICE_TRIALS : CONFIG.REAL_TRIALS;
+            
+            // Update UI
+            document.getElementById('trial-counter').textContent = trialIndex + 1;
+            document.getElementById('progress-bar').style.width = ((trialIndex / totalTrials) * 100) + '%';
+            
+            // Reset state
+            state.canRespond = false;
+            state.responded = false;
+            state.trialStartTime = Date.now();
+            
+            const display = document.getElementById('stimulus-display');
+            
+            // Phase 1: Fixation (0-500ms)
+            display.textContent = '+';
+            display.className = 'fixation';
+            
+            state.timeoutIds.push(setTimeout(() => {
+                // Phase 2: Stimulus (500-1500ms)
+                display.textContent = state.sequence[trialIndex];
+                display.className = '';
+                state.stimulusOnsetTime = Date.now();
+                state.canRespond = true;
+                
+                state.timeoutIds.push(setTimeout(() => {
+                    // Phase 3: Blank/Response (1500-2000ms)
+                    display.textContent = '';
+                    
+                    state.timeoutIds.push(setTimeout(() => {
+                        // End of trial
+                        if (!state.responded) {
+                            recordTrial(null); // No response
+                        }
+                        state.currentTrial++;
+                        state.globalTrialNumber++;
+                        runTrialLoop();
+                    }, CONFIG.RESPONSE_WINDOW));
+                    
+                }, CONFIG.STIMULUS_DURATION));
+                
+            }, CONFIG.FIXATION_DURATION));
+        }
+
+        function handleResponse(isMatch) {
+            if (!state.canRespond || state.responded) return;
+            
+            state.responded = true;
+            const rt = Date.now() - state.stimulusOnsetTime;
+            recordTrial(isMatch, rt);
+            
+            // Visual feedback during practice
+            if (state.isPractice) {
+                const correct = (isMatch === state.isTarget[state.currentTrial]);
+                showFeedback(correct);
+            }
+        }
+
+        function showFeedback(correct) {
+            const fb = document.getElementById('feedback');
+            fb.textContent = correct ? '✓ Correct' : '✗ Wrong';
+            fb.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
+            
+            setTimeout(() => {
+                fb.className = 'feedback';
+            }, 500);
+        }
+
+        function recordTrial(response, rt = null) {
+            const trialIdx = state.currentTrial;
+            const isTarget = state.isTarget[trialIdx];
+            const correctResponse = isTarget; // true = match, false = no match
+            
+            let accuracy = null;
+            if (response !== null) {
+                accuracy = (response === correctResponse) ? 1 : 0;
+            }
+            
+            const trialData = {
+                participant_id: state.participantId,
+                session_id: state.sessionId,
+                block_number: state.blockNumber,
+                difficulty_label: 'nback' + state.currentDifficulty,
+                n_level: state.currentDifficulty,
+                trial_number_in_block: trialIdx + 1,
+                trial_number_global: state.globalTrialNumber + 1,
+                stimulus: state.sequence[trialIdx],
+                is_target: isTarget ? 1 : 0,
+                correct_response: correctResponse ? 'match' : 'no_match',
+                participant_response: response === null ? 'none' : (response ? 'match' : 'no_match'),
+                accuracy: accuracy,
+                reaction_time_ms: rt,
+                timestamp_start: new Date(state.trialStartTime).toISOString(),
+                timestamp_end: new Date().toISOString(),
+                user_agent: navigator.userAgent,
+                browser_guess: detectBrowser(),
+                screen_width: window.screen.width,
+                screen_height: window.screen.height
+            };
+            
+            state.currentBlockData.push(trialData);
+        }
+
+        function detectBrowser() {
+            const ua = navigator.userAgent;
+            if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Safari';
+            if (ua.includes('Chrome')) return 'Chrome';
+            if (ua.includes('Firefox')) return 'Firefox';
+            return 'Unknown';
+        }
+
+        // ==========================================
+        // BLOCK END & DATA HANDLING
+        // ==========================================
+        function endBlock() {
+            // Clear any pending timeouts
+            state.timeoutIds.forEach(id => clearTimeout(id));
+            state.timeoutIds = [];
+            
+            if (state.isPractice) {
+                // After practice, start real block
+                const accuracy = calculateBlockAccuracy();
+                if (accuracy < 0.5) {
+                    alert(`Practice accuracy: ${(accuracy * 100).toFixed(0)}%. You may want to try again.`);
+                }
+                startRealBlock();
+            } else {
+                // After real block, save data and show break
+                saveDataLocally();
+                showBreakScreen();
+            }
+        }
+
+        function calculateBlockAccuracy() {
+            const validTrials = state.currentBlockData.filter(t => t.accuracy !== null);
+            if (validTrials.length === 0) return 0;
+            const correct = validTrials.filter(t => t.accuracy === 1).length;
+            return correct / validTrials.length;
+        }
+
+        function calculateMeanRT() {
+            const validRTs = state.currentBlockData
+                .filter(t => t.reaction_time_ms !== null)
+                .map(t => t.reaction_time_ms);
+            if (validRTs.length === 0) return 0;
+            return validRTs.reduce((a, b) => a + b, 0) / validRTs.length;
+        }
+
+        function showBreakScreen() {
+            const accuracy = calculateBlockAccuracy();
+            const meanRT = calculateMeanRT();
+            
+            document.getElementById('break-difficulty').textContent = state.currentDifficulty + '-Back';
+            document.getElementById('break-accuracy').textContent = (accuracy * 100).toFixed(1) + '%';
+            document.getElementById('break-rt').textContent = Math.round(meanRT) + ' ms';
+            document.getElementById('break-trials').textContent = state.currentBlockData.length;
+            
+            showScreen('screen-break');
+        }
+
+        function returnToDifficulty() {
+            submitBlockData();
+            showScreen('screen-difficulty');
+            updateBlockInfo();
+        }
+
+        // ==========================================
+        // DATA SUBMISSION & STORAGE
+        // ==========================================
+        function saveDataLocally() {
+            // Save to localStorage as backup
+            const key = `nback_${state.sessionId}_block${state.blockNumber}`;
+            localStorage.setItem(key, JSON.stringify(state.currentBlockData));
+            
+            // Also trigger download as immediate backup
+            downloadBlockData();
+        }
+
+        function downloadBlockData() {
+            const csv = convertToCSV(state.currentBlockData);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `nback_${state.participantId}_block${state.blockNumber}_${new Date().toISOString().slice(0,10)}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function convertToCSV(data) {
+            if (data.length === 0) return '';
+            const headers = Object.keys(data[0]);
+            const rows = data.map(row => 
+                headers.map(h => {
+                    const val = row[h];
+                    // Escape commas and quotes
+                    if (typeof val === 'string' && (val.includes(',') || val.includes('"'))) {
+                        return '"' + val.replace(/"/g, '""') + '"';
+                    }
+                    return val;
+                }).join(',')
+            );
+            return [headers.join(','), ...rows].join('\n');
+        }
+
+        async function submitBlockData() {
+            // Show submission screen briefly if not already visible
+            const submissionScreen = document.getElementById('screen-submission');
+            const statusDiv = document.getElementById('submission-status');
+            const resultDiv = document.getElementById('submission-result');
+            
+            if (!document.querySelector('.screen.active').id.includes('difficulty')) {
+                showScreen('screen-submission');
+            }
+            
+            const blockStats = {
+                participant_id: state.participantId,
+                session_id: state.sessionId,
+                block_number: state.blockNumber,
+                difficulty: state.currentDifficulty + '-Back',
+                n_level: state.currentDifficulty,
+                trial_count: state.currentBlockData.length,
+                accuracy: calculateBlockAccuracy(),
+                mean_rt: calculateMeanRT(),
+                timestamp: new Date().toISOString(),
+                trials: state.currentBlockData
+            };
+            
+            try {
+                // Submit to Google Apps Script
+                const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(blockStats)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    statusDiv.style.display = 'none';
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `
+                        <div class="stats-box">
+                            <h3 class="success">✓ Data Saved Successfully</h3>
+                            <p>Block ${state.blockNumber} results have been emailed.</p>
+                            <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">
+                                Backup CSV was also downloaded to your device.
+                            </p>
+                        </div>
+                    `;
+                } else {
+                    throw new Error('Server reported failure');
+                }
+            } catch (error) {
+                console.error('Submission error:', error);
+                statusDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+                resultDiv.innerHTML = `
+                    <div class="stats-box">
+                        <h3 class="warning">⚠ Submission Failed</h3>
+                        <p>Data is saved locally and CSV was downloaded.</p>
+                        <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">
+                            Error: ${error.message}
+                        </p>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('btn-new-session').style.display = 'block';
+        }
+
+        // ==========================================
+        // UTILITY FUNCTIONS
+        // ==========================================
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function showAdmin() {
+            const password = prompt('Enter admin password:');
+            if (password === 'nbackadmin2024') {
+                viewLocalStorage();
+            }
+        }
+
+        function viewLocalStorage() {
+            let html = '<h2>Local Backup Data</h2>';
+            let hasData = false;
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('nback_')) {
+                    hasData = true;
+                    const data = JSON.parse(localStorage.getItem(key));
+                    html += `<div style="margin: 10px 0; padding: 10px; background: #333; border-radius: 8px;">
+                        <strong>${key}</strong> (${data.length} trials)
+                        <button onclick="downloadFromStorage('${key}')" style="margin-left: 10px;">Download CSV</button>
+                    </div>`;
+                }
+            }
+            if (!hasData) html += '<p>No local data found.</p>';
+            
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            div.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:#1a1a1a;z-index:1000;overflow:auto;padding:20px;';
+            document.body.appendChild(div);
+        }
+
+        function downloadFromStorage(key) {
+            const data = JSON.parse(localStorage.getItem(key));
+            const csv = convertToCSV(data);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = key + '.csv';
+            a.click();
+        }
+
+        // Prevent zoom on double tap (mobile)
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Prevent pull-to-refresh
+        document.body.addEventListener('touchmove', function(e) {
+            if (e.target.closest('.screen') && document.querySelector('.screen.active').scrollHeight <= document.querySelector('.screen.active').clientHeight) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</body>
+</html>
