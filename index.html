@@ -113,6 +113,12 @@
             background: #FF3B30;
         }
         
+        .btn-skip {
+            background: #666;
+            font-size: 1rem;
+            padding: 15px;
+        }
+        
         .btn-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -171,7 +177,7 @@
             height: 6px;
             background: #333;
             border-radius: 3px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             overflow: hidden;
         }
         
@@ -179,6 +185,48 @@
             height: 100%;
             background: #007AFF;
             transition: width 0.2s;
+        }
+        
+        /* Timer Display */
+        .timer-display {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #FF9500;
+            margin-bottom: 10px;
+        }
+        
+        /* Step Indicator */
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+        
+        .step-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #444;
+            transition: all 0.3s;
+        }
+        
+        .step-dot.active {
+            background: #007AFF;
+            transform: scale(1.3);
+        }
+        
+        .step-dot.completed {
+            background: #34C759;
+        }
+        
+        .step-label {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 5px;
         }
         
         /* Stats Display */
@@ -200,6 +248,22 @@
             justify-content: space-between;
             margin: 8px 0;
             font-size: 0.95rem;
+        }
+        
+        /* Break Screen Specific */
+        .break-timer {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #007AFF;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .break-info {
+            background: #2a2a2a;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
         }
         
         /* Utility */
@@ -241,6 +305,31 @@
             color: #666;
             text-decoration: none;
         }
+        
+        /* Phase Badge */
+        .phase-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .phase-practice {
+            background: #FF9500;
+            color: #000;
+        }
+        
+        .phase-real {
+            background: #34C759;
+            color: #000;
+        }
+        
+        .phase-break {
+            background: #5856D6;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -248,6 +337,13 @@
     <!-- Screen 1: Participant ID Entry -->
     <div id="screen-id" class="screen active center-content">
         <h1>N-Back Task</h1>
+        <div class="step-indicator">
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+        </div>
+        <p class="step-label">Step 1: Enter ID</p>
         <p>Please enter your Participant ID:</p>
         <input type="text" id="participant-id" placeholder="e.g., P001" maxlength="20">
         <button class="btn btn-success" onclick="startSession()">Start Session</button>
@@ -259,17 +355,24 @@
     <!-- Screen 2: Difficulty Selection -->
     <div id="screen-difficulty" class="screen center-content">
         <h1>Select Difficulty</h1>
+        <div class="step-indicator">
+            <div class="step-dot completed"></div>
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+            <div class="step-dot"></div>
+        </div>
+        <p class="step-label">Step 2: Choose Level</p>
         <p>Choose the n-back level for the next block:</p>
         <div style="max-width: 400px; width: 100%;">
-            <button class="btn btn-secondary" onclick="startPractice(2)">
+            <button class="btn btn-secondary" onclick="startPracticePhase(2)">
                 2-Back<br>
                 <small style="font-weight: normal; opacity: 0.8;">Match letter from 2 trials ago</small>
             </button>
-            <button class="btn btn-secondary" onclick="startPractice(3)">
+            <button class="btn btn-secondary" onclick="startPracticePhase(3)">
                 3-Back<br>
                 <small style="font-weight: normal; opacity: 0.8;">Match letter from 3 trials ago</small>
             </button>
-            <button class="btn btn-secondary" onclick="startPractice(4)">
+            <button class="btn btn-secondary" onclick="startPracticePhase(4)">
                 4-Back<br>
                 <small style="font-weight: normal; opacity: 0.8;">Match letter from 4 trials ago</small>
             </button>
@@ -280,13 +383,23 @@
     <!-- Screen 3: Practice Instructions -->
     <div id="screen-practice-instructions" class="screen center-content">
         <h1>Practice Block</h1>
+        <div class="step-indicator">
+            <div class="step-dot completed"></div>
+            <div class="step-dot completed"></div>
+            <div class="step-dot active"></div>
+            <div class="step-dot"></div>
+        </div>
+        <p class="step-label">Step 3: Practice (Optional)</p>
+        <span class="phase-badge phase-practice">PRACTICE MODE</span>
         <div class="info-text">
             <p><strong>Instructions:</strong></p>
             <p>Press <strong>MATCH</strong> if the current letter matches the letter shown <span id="practice-n-level">2</span> trials ago.</p>
             <p>Press <strong>NO MATCH</strong> if it is different.</p>
             <p class="warning">You will receive feedback during practice.</p>
+            <p style="font-size: 0.85rem; margin-top: 10px;">Duration: ~24 seconds (12 trials)</p>
         </div>
         <button class="btn btn-success" onclick="startPracticeTrials()">Start Practice (12 trials)</button>
+        <button class="btn btn-skip" onclick="skipPractice()">Skip Practice → Start Real Block (4 min)</button>
     </div>
 
     <!-- Screen 4: Task Screen (Practice & Real) -->
@@ -294,8 +407,9 @@
         <div class="progress-container">
             <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
         </div>
+        <div class="timer-display" id="timer-display">00:00</div>
         <div style="text-align: center; margin-bottom: 10px; color: #888; font-size: 0.9rem;">
-            <span id="block-type-label">Practice</span> | 
+            <span id="phase-badge" class="phase-badge phase-practice">PRACTICE</span><br>
             <span id="difficulty-label">2-Back</span> | 
             Trial <span id="trial-counter">0</span>/<span id="total-trials">12</span>
         </div>
@@ -314,21 +428,50 @@
         </div>
     </div>
 
-    <!-- Screen 5: Break Screen -->
+    <!-- Screen 5: Transition Screen (Practice → Real) -->
+    <div id="screen-transition" class="screen center-content">
+        <h1>Practice Complete!</h1>
+        <div class="step-indicator">
+            <div class="step-dot completed"></div>
+            <div class="step-dot completed"></div>
+            <div class="step-dot completed"></div>
+            <div class="step-dot active"></div>
+        </div>
+        <p class="step-label">Step 4: Ready for Real Block</p>
+        <div class="stats-box">
+            <h3>Practice Summary</h3>
+            <div class="stat-row"><span>Difficulty:</span><span id="transition-difficulty">-</span></div>
+            <div class="stat-row"><span>Accuracy:</span><span id="transition-accuracy">-</span></div>
+            <div class="stat-row"><span>Mean RT:</span><span id="transition-rt">-</span></div>
+        </div>
+        <div class="info-text" style="background: #34C759; color: #000;">
+            <p><strong>Next: Real Block</strong></p>
+            <p>Duration: 4 minutes (120 trials)<br>No feedback will be shown</p>
+        </div>
+        <button class="btn btn-success" onclick="startRealBlock()">Start Real Block (4 min)</button>
+    </div>
+
+    <!-- Screen 6: Break Screen -->
     <div id="screen-break" class="screen center-content">
         <h1>Block Complete!</h1>
+        <span class="phase-badge phase-break">BREAK TIME</span>
+        <div class="break-timer" id="break-timer">00:00</div>
+        <div class="break-info">
+            <p style="margin: 0; font-size: 0.9rem;">Break duration is being recorded</p>
+        </div>
         <div class="stats-box">
             <h3>Block Summary</h3>
+            <div class="stat-row"><span>Block Number:</span><span id="break-block-num">-</span></div>
             <div class="stat-row"><span>Difficulty:</span><span id="break-difficulty">-</span></div>
             <div class="stat-row"><span>Accuracy:</span><span id="break-accuracy">-</span></div>
             <div class="stat-row"><span>Mean RT:</span><span id="break-rt">-</span></div>
             <div class="stat-row"><span>Trials:</span><span id="break-trials">-</span></div>
         </div>
         <p>Take a break. When ready, continue to the next block.</p>
-        <button class="btn btn-success" onclick="returnToDifficulty()">Continue</button>
+        <button class="btn btn-success" onclick="endBreak()">Continue to Next Block</button>
     </div>
 
-    <!-- Screen 6: Data Submission -->
+    <!-- Screen 7: Data Submission -->
     <div id="screen-submission" class="screen center-content">
         <h1>Saving Results</h1>
         <div id="submission-status">
@@ -351,7 +494,7 @@
         // CONFIGURATION
         // ==========================================
         const CONFIG = {
-            GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwvQrEHGVvcelZgcU5vT6xCZiYOXJf2OS_o5tu8f5rn1g1pjC4_znMLiT5pibXQTsq0ag/exec', // Replace this!
+            GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec', // Replace this!
             PRACTICE_TRIALS: 12,
             REAL_TRIALS: 120,
             TRIAL_DURATION: 2000, // ms
@@ -380,7 +523,10 @@
             isTarget: [],
             canRespond: false,
             responded: false,
-            timeoutIds: []
+            timeoutIds: [],
+            blockStartTime: 0,
+            breakStartTime: 0,
+            breakDuration: 0
         };
 
         // ==========================================
@@ -416,25 +562,22 @@
             const seq = [];
             const targets = [];
             
-            // First n trials: never targets
             for (let i = 0; i < n; i++) {
                 seq.push(CONFIG.LETTERS[Math.floor(Math.random() * CONFIG.LETTERS.length)]);
                 targets.push(false);
             }
             
-            // Generate remaining trials with ~30% targets
             let targetCount = 0;
             const targetGoal = Math.floor((length - n) * CONFIG.TARGET_PROBABILITY);
             
             for (let i = n; i < length; i++) {
                 const shouldBeTarget = (targetCount < targetGoal) && (Math.random() < 0.5);
                 
-                if (shouldBeTarget && !targets[i-1]) { // Avoid consecutive targets
-                    seq.push(seq[i - n]); // Match n-back
+                if (shouldBeTarget && !targets[i-1]) {
+                    seq.push(seq[i - n]);
                     targets.push(true);
                     targetCount++;
                 } else {
-                    // Random non-matching letter
                     let letter;
                     do {
                         letter = CONFIG.LETTERS[Math.floor(Math.random() * CONFIG.LETTERS.length)];
@@ -448,9 +591,9 @@
         }
 
         // ==========================================
-        // PRACTICE BLOCK
+        // PRACTICE PHASE
         // ==========================================
-        function startPractice(n) {
+        function startPracticePhase(n) {
             state.currentDifficulty = n;
             document.getElementById('practice-n-level').textContent = n;
             showScreen('screen-practice-instructions');
@@ -460,38 +603,80 @@
             state.isPractice = true;
             state.currentBlockData = [];
             state.currentTrial = 0;
+            state.blockStartTime = Date.now();
             
             const seqData = generateSequence(state.currentDifficulty, CONFIG.PRACTICE_TRIALS);
             state.sequence = seqData.sequence;
             state.isTarget = seqData.isTarget;
             
-            document.getElementById('block-type-label').textContent = 'Practice';
+            document.getElementById('phase-badge').textContent = 'PRACTICE';
+            document.getElementById('phase-badge').className = 'phase-badge phase-practice';
             document.getElementById('difficulty-label').textContent = state.currentDifficulty + '-Back';
             document.getElementById('total-trials').textContent = CONFIG.PRACTICE_TRIALS;
             
             showScreen('screen-task');
+            updateTimer();
             runTrialLoop();
         }
 
+        function skipPractice() {
+            // Direkt real block'a geç, practice yapma
+            showTransitionScreen();
+        }
+
         // ==========================================
-        // REAL BLOCK
+        // TRANSITION SCREEN (Practice → Real)
         // ==========================================
+        function showTransitionScreen() {
+            // Practice verisi boş ama gösterelim
+            document.getElementById('transition-difficulty').textContent = state.currentDifficulty + '-Back';
+            document.getElementById('transition-accuracy').textContent = 'Skipped';
+            document.getElementById('transition-rt').textContent = 'N/A';
+            
+            showScreen('screen-transition');
+        }
+
         function startRealBlock() {
-            state.blockNumber++;
             state.isPractice = false;
+            state.blockNumber++;
             state.currentBlockData = [];
             state.currentTrial = 0;
+            state.blockStartTime = Date.now();
             
             const seqData = generateSequence(state.currentDifficulty, CONFIG.REAL_TRIALS);
             state.sequence = seqData.sequence;
             state.isTarget = seqData.isTarget;
             
-            document.getElementById('block-type-label').textContent = 'Block ' + state.blockNumber;
+            document.getElementById('phase-badge').textContent = 'BLOCK ' + state.blockNumber;
+            document.getElementById('phase-badge').className = 'phase-badge phase-real';
             document.getElementById('difficulty-label').textContent = state.currentDifficulty + '-Back';
             document.getElementById('total-trials').textContent = CONFIG.REAL_TRIALS;
             
             showScreen('screen-task');
+            updateTimer();
             runTrialLoop();
+        }
+
+        // ==========================================
+        // TIMER FUNCTION
+        // ==========================================
+        function updateTimer() {
+            if (!document.getElementById('screen-task').classList.contains('active')) return;
+            
+            const elapsed = Date.now() - state.blockStartTime;
+            const totalDuration = state.isPractice ? 
+                (CONFIG.PRACTICE_TRIALS * CONFIG.TRIAL_DURATION) : 
+                (CONFIG.REAL_TRIALS * CONFIG.TRIAL_DURATION);
+            const remaining = Math.max(0, totalDuration - elapsed);
+            
+            const minutes = Math.floor(remaining / 60000);
+            const seconds = Math.floor((remaining % 60000) / 1000);
+            document.getElementById('timer-display').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (remaining > 0) {
+                requestAnimationFrame(updateTimer);
+            }
         }
 
         // ==========================================
@@ -506,36 +691,34 @@
             const trialIndex = state.currentTrial;
             const totalTrials = state.isPractice ? CONFIG.PRACTICE_TRIALS : CONFIG.REAL_TRIALS;
             
-            // Update UI
             document.getElementById('trial-counter').textContent = trialIndex + 1;
             document.getElementById('progress-bar').style.width = ((trialIndex / totalTrials) * 100) + '%';
             
-            // Reset state
             state.canRespond = false;
             state.responded = false;
             state.trialStartTime = Date.now();
             
             const display = document.getElementById('stimulus-display');
             
-            // Phase 1: Fixation (0-500ms)
+            // Phase 1: Fixation
             display.textContent = '+';
             display.className = 'fixation';
             
             state.timeoutIds.push(setTimeout(() => {
-                // Phase 2: Stimulus (500-1500ms)
+                // Phase 2: Stimulus
                 display.textContent = state.sequence[trialIndex];
                 display.className = '';
                 state.stimulusOnsetTime = Date.now();
                 state.canRespond = true;
                 
                 state.timeoutIds.push(setTimeout(() => {
-                    // Phase 3: Blank/Response (1500-2000ms)
+                    // Phase 3: Blank/Response
                     display.textContent = '';
                     
                     state.timeoutIds.push(setTimeout(() => {
                         // End of trial
                         if (!state.responded) {
-                            recordTrial(null); // No response
+                            recordTrial(null);
                         }
                         state.currentTrial++;
                         state.globalTrialNumber++;
@@ -554,7 +737,6 @@
             const rt = Date.now() - state.stimulusOnsetTime;
             recordTrial(isMatch, rt);
             
-            // Visual feedback during practice
             if (state.isPractice) {
                 const correct = (isMatch === state.isTarget[state.currentTrial]);
                 showFeedback(correct);
@@ -574,7 +756,7 @@
         function recordTrial(response, rt = null) {
             const trialIdx = state.currentTrial;
             const isTarget = state.isTarget[trialIdx];
-            const correctResponse = isTarget; // true = match, false = no match
+            const correctResponse = isTarget;
             
             let accuracy = null;
             if (response !== null) {
@@ -615,22 +797,24 @@
         }
 
         // ==========================================
-        // BLOCK END & DATA HANDLING
+        // BLOCK END & BREAK
         // ==========================================
         function endBlock() {
-            // Clear any pending timeouts
             state.timeoutIds.forEach(id => clearTimeout(id));
             state.timeoutIds = [];
             
             if (state.isPractice) {
-                // After practice, start real block
+                // Practice bitti, transition ekranına git
                 const accuracy = calculateBlockAccuracy();
-                if (accuracy < 0.5) {
-                    alert(`Practice accuracy: ${(accuracy * 100).toFixed(0)}%. You may want to try again.`);
-                }
-                startRealBlock();
+                const meanRT = calculateMeanRT();
+                
+                document.getElementById('transition-difficulty').textContent = state.currentDifficulty + '-Back';
+                document.getElementById('transition-accuracy').textContent = accuracy > 0 ? (accuracy * 100).toFixed(1) + '%' : 'N/A';
+                document.getElementById('transition-rt').textContent = meanRT > 0 ? Math.round(meanRT) + ' ms' : 'N/A';
+                
+                showScreen('screen-transition');
             } else {
-                // After real block, save data and show break
+                // Real block bitti, break ekranına git
                 saveDataLocally();
                 showBreakScreen();
             }
@@ -651,19 +835,50 @@
             return validRTs.reduce((a, b) => a + b, 0) / validRTs.length;
         }
 
+        // ==========================================
+        // BREAK SCREEN WITH TIMER
+        // ==========================================
         function showBreakScreen() {
             const accuracy = calculateBlockAccuracy();
             const meanRT = calculateMeanRT();
             
+            document.getElementById('break-block-num').textContent = state.blockNumber;
             document.getElementById('break-difficulty').textContent = state.currentDifficulty + '-Back';
             document.getElementById('break-accuracy').textContent = (accuracy * 100).toFixed(1) + '%';
             document.getElementById('break-rt').textContent = Math.round(meanRT) + ' ms';
             document.getElementById('break-trials').textContent = state.currentBlockData.length;
             
+            state.breakStartTime = Date.now();
+            state.breakDuration = 0;
+            
             showScreen('screen-break');
+            updateBreakTimer();
         }
 
-        function returnToDifficulty() {
+        function updateBreakTimer() {
+            if (!document.getElementById('screen-break').classList.contains('active')) return;
+            
+            state.breakDuration = Date.now() - state.breakStartTime;
+            const minutes = Math.floor(state.breakDuration / 60000);
+            const seconds = Math.floor((state.breakDuration % 60000) / 1000);
+            
+            document.getElementById('break-timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            requestAnimationFrame(updateBreakTimer);
+        }
+
+        function endBreak() {
+            // Break süresini son denemeye ekle
+            const breakDurationSec = Math.round(state.breakDuration / 1000);
+            
+            // Son denemeye break bilgisini ekle
+            if (state.currentBlockData.length > 0) {
+                state.currentBlockData[state.currentBlockData.length - 1].break_duration_sec = breakDurationSec;
+                state.currentBlockData[state.currentBlockData.length - 1].break_start_time = new Date(state.breakStartTime).toISOString();
+                state.currentBlockData[state.currentBlockData.length - 1].break_end_time = new Date().toISOString();
+            }
+            
             submitBlockData();
             showScreen('screen-difficulty');
             updateBlockInfo();
@@ -673,11 +888,8 @@
         // DATA SUBMISSION & STORAGE
         // ==========================================
         function saveDataLocally() {
-            // Save to localStorage as backup
             const key = `nback_${state.sessionId}_block${state.blockNumber}`;
             localStorage.setItem(key, JSON.stringify(state.currentBlockData));
-            
-            // Also trigger download as immediate backup
             downloadBlockData();
         }
 
@@ -699,10 +911,9 @@
             const headers = Object.keys(data[0]);
             const rows = data.map(row => 
                 headers.map(h => {
-                    const val = row[h];
-                    // Escape commas and quotes
+                    let val = row[h];
                     if (typeof val === 'string' && (val.includes(',') || val.includes('"'))) {
-                        return '"' + val.replace(/"/g, '""') + '"';
+                        val = '"' + val.replace(/"/g, '""') + '"';
                     }
                     return val;
                 }).join(',')
@@ -711,7 +922,6 @@
         }
 
         async function submitBlockData() {
-            // Show submission screen briefly if not already visible
             const submissionScreen = document.getElementById('screen-submission');
             const statusDiv = document.getElementById('submission-status');
             const resultDiv = document.getElementById('submission-result');
@@ -729,12 +939,12 @@
                 trial_count: state.currentBlockData.length,
                 accuracy: calculateBlockAccuracy(),
                 mean_rt: calculateMeanRT(),
+                break_duration_sec: state.currentBlockData[state.currentBlockData.length - 1]?.break_duration_sec || 0,
                 timestamp: new Date().toISOString(),
                 trials: state.currentBlockData
             };
             
             try {
-                // Submit to Google Apps Script
                 const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     headers: {
@@ -753,6 +963,7 @@
                             <h3 class="success">✓ Data Saved Successfully</h3>
                             <p>Block ${state.blockNumber} results have been emailed.</p>
                             <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">
+                                Break duration: ${blockStats.break_duration_sec} seconds<br>
                                 Backup CSV was also downloaded to your device.
                             </p>
                         </div>
@@ -769,6 +980,7 @@
                         <h3 class="warning">⚠ Submission Failed</h3>
                         <p>Data is saved locally and CSV was downloaded.</p>
                         <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">
+                            Break duration: ${blockStats.break_duration_sec} seconds<br>
                             Error: ${error.message}
                         </p>
                     </div>
@@ -826,7 +1038,7 @@
             a.click();
         }
 
-        // Prevent zoom on double tap (mobile)
+        // Mobile optimizations
         let lastTouchEnd = 0;
         document.addEventListener('touchend', function (event) {
             const now = (new Date()).getTime();
@@ -836,7 +1048,6 @@
             lastTouchEnd = now;
         }, false);
 
-        // Prevent pull-to-refresh
         document.body.addEventListener('touchmove', function(e) {
             if (e.target.closest('.screen') && document.querySelector('.screen.active').scrollHeight <= document.querySelector('.screen.active').clientHeight) {
                 e.preventDefault();
