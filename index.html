@@ -11,7 +11,7 @@
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
         }
-        
+
         body {
             margin: 0;
             padding: 0;
@@ -23,7 +23,7 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .screen {
             display: none;
             flex: 1;
@@ -32,24 +32,24 @@
             height: 100vh;
             overflow-y: auto;
         }
-        
+
         .screen.active {
             display: flex;
         }
-        
+
         h1 {
             font-size: 1.5rem;
             text-align: center;
             margin-bottom: 1rem;
             font-weight: 600;
         }
-        
+
         h2 {
             font-size: 1.3rem;
             text-align: center;
             margin-bottom: 0.5rem;
         }
-        
+
         p {
             font-size: 1rem;
             line-height: 1.5;
@@ -57,7 +57,7 @@
             max-width: 600px;
             margin: 0 auto 1rem;
         }
-        
+
         input[type="text"] {
             width: 100%;
             padding: 15px;
@@ -70,12 +70,12 @@
             margin-bottom: 1rem;
             -webkit-appearance: none;
         }
-        
+
         input[type="text"]:focus {
             outline: none;
             border-color: #007AFF;
         }
-        
+
         .btn {
             width: 100%;
             padding: 20px;
@@ -91,35 +91,35 @@
             -webkit-touch-callout: none;
             user-select: none;
         }
-        
+
         .btn:active {
             transform: scale(0.98);
             opacity: 0.9;
         }
-        
+
         .btn-secondary {
             background: #5856D6;
         }
-        
+
         .btn-success {
             background: #34C759;
         }
-        
+
         .btn-danger {
             background: #FF3B30;
         }
-        
+
         .btn-warning {
             background: #FF9500;
             color: #000;
         }
-        
+
         .btn-finish {
             background: #FF3B30;
             margin-top: 20px;
             border: 2px solid #fff;
         }
-        
+
         .btn-end-session {
             background: #8E8E93;
             font-size: 0.9rem;
@@ -128,13 +128,13 @@
             width: auto;
             display: inline-block;
         }
-        
+
         .btn-skip {
             background: #666;
             font-size: 1rem;
             padding: 15px;
         }
-        
+
         .btn-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -142,12 +142,12 @@
             margin-top: auto;
             margin-bottom: 20px;
         }
-        
+
         .btn-large {
             padding: 30px 20px;
             font-size: 1.5rem;
         }
-        
+
         .difficulty-grid {
             display: flex;
             flex-direction: column;
@@ -155,7 +155,7 @@
             max-width: 400px;
             width: 100%;
         }
-        
+
         #stimulus-display {
             flex: 1;
             display: flex;
@@ -165,12 +165,12 @@
             font-weight: bold;
             min-height: 200px;
         }
-        
+
         .fixation {
             color: #666;
             font-size: 4rem !important;
         }
-        
+
         .feedback {
             position: fixed;
             top: 50%;
@@ -183,17 +183,17 @@
             z-index: 100;
             display: none;
         }
-        
+
         .feedback.correct {
             background: rgba(52, 199, 89, 0.9);
             display: block;
         }
-        
+
         .feedback.incorrect {
             background: rgba(255, 59, 48, 0.9);
             display: block;
         }
-        
+
         .progress-container {
             width: 100%;
             height: 6px;
@@ -202,13 +202,13 @@
             margin-bottom: 10px;
             overflow: hidden;
         }
-        
+
         .progress-bar {
             height: 100%;
             background: #007AFF;
             transition: width 0.2s;
         }
-        
+
         .timer-display {
             text-align: center;
             font-size: 1.2rem;
@@ -216,7 +216,7 @@
             color: #FF9500;
             margin-bottom: 10px;
         }
-        
+
         .step-indicator {
             display: flex;
             justify-content: center;
@@ -224,7 +224,7 @@
             margin-bottom: 20px;
             padding: 10px;
         }
-        
+
         .step-dot {
             width: 10px;
             height: 10px;
@@ -232,23 +232,23 @@
             background: #444;
             transition: all 0.3s;
         }
-        
+
         .step-dot.active {
             background: #007AFF;
             transform: scale(1.3);
         }
-        
+
         .step-dot.completed {
             background: #34C759;
         }
-        
+
         .step-label {
             text-align: center;
             font-size: 0.8rem;
             color: #888;
             margin-top: 5px;
         }
-        
+
         .stats-box {
             background: #2a2a2a;
             padding: 20px;
@@ -256,19 +256,19 @@
             margin: 10px 0;
             text-align: left;
         }
-        
+
         .stats-box h3 {
             margin-top: 0;
             color: #007AFF;
         }
-        
+
         .stat-row {
             display: flex;
             justify-content: space-between;
             margin: 8px 0;
             font-size: 0.95rem;
         }
-        
+
         .break-timer {
             font-size: 3rem;
             font-weight: bold;
@@ -276,23 +276,23 @@
             text-align: center;
             margin: 20px 0;
         }
-        
+
         .break-info {
             background: #2a2a2a;
             padding: 15px;
             border-radius: 10px;
             margin: 15px 0;
         }
-        
+
         .hidden {
             display: none !important;
         }
-        
+
         .center-content {
             justify-content: center;
             align-items: center;
         }
-        
+
         .info-text {
             background: #2a2a2a;
             padding: 15px;
@@ -300,20 +300,20 @@
             margin: 15px 0;
             font-size: 0.95rem;
         }
-        
+
         .warning {
             color: #FF9500;
             font-weight: 600;
         }
-        
+
         .success {
             color: #34C759;
         }
-        
+
         .error {
             color: #FF3B30;
         }
-        
+
         .admin-link {
             position: fixed;
             bottom: 10px;
@@ -322,7 +322,7 @@
             color: #666;
             text-decoration: none;
         }
-        
+
         .phase-badge {
             display: inline-block;
             padding: 5px 15px;
@@ -331,22 +331,22 @@
             font-weight: 600;
             margin-bottom: 10px;
         }
-        
+
         .phase-practice {
             background: #FF9500;
             color: #000;
         }
-        
+
         .phase-real {
             background: #34C759;
             color: #000;
         }
-        
+
         .phase-break {
             background: #5856D6;
             color: #fff;
         }
-        
+
         .recovery-box {
             background: #2a2a2a;
             border: 2px solid #FF9500;
@@ -355,7 +355,7 @@
             margin: 20px 0;
             text-align: center;
         }
-        
+
         .auto-save-indicator {
             position: fixed;
             top: 10px;
@@ -368,11 +368,11 @@
             display: none;
             z-index: 1000;
         }
-        
+
         .auto-save-indicator.visible {
             display: block;
         }
-        
+
         .finished-badge {
             background: #34C759;
             color: #000;
@@ -381,7 +381,7 @@
             font-size: 0.7rem;
             margin-left: 10px;
         }
-        
+
         .end-session-container {
             text-align: center;
             margin-bottom: 10px;
@@ -390,12 +390,10 @@
 </head>
 <body>
 
-    <!-- Auto Save Indicator -->
     <div id="auto-save-indicator" class="auto-save-indicator">
         ✓ Auto-saved
     </div>
 
-    <!-- Screen 1: Participant ID Entry -->
     <div id="screen-id" class="screen active center-content">
         <h1>N-Back Task</h1>
         <div class="step-indicator">
@@ -413,7 +411,6 @@
         </div>
     </div>
 
-    <!-- Screen 1.5: Recovery Screen -->
     <div id="screen-recovery" class="screen center-content">
         <h1>Welcome Back!</h1>
         <div class="recovery-box">
@@ -426,7 +423,6 @@
         <button class="btn btn-warning" onclick="startNewSessionFromRecovery()">Start New Session (Delete Old)</button>
     </div>
 
-    <!-- Screen 2: Difficulty Selection -->
     <div id="screen-difficulty" class="screen center-content">
         <h1>Select Difficulty</h1>
         <div class="step-indicator">
@@ -454,7 +450,6 @@
         <div id="completed-blocks" style="margin-top: 20px; font-size: 0.9rem; color: #aaa;"></div>
     </div>
 
-    <!-- Screen 3: Practice Instructions -->
     <div id="screen-practice-instructions" class="screen center-content">
         <h1>Practice Block</h1>
         <div class="step-indicator">
@@ -476,26 +471,24 @@
         <button class="btn btn-skip" onclick="skipPractice()">Skip Practice → Start Real Block (4 min)</button>
     </div>
 
-    <!-- Screen 4: Task Screen -->
     <div id="screen-task" class="screen">
         <div class="progress-container">
             <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
         </div>
         <div class="timer-display" id="timer-display">00:00</div>
-        
-        <!-- END SESSION BUTTON - Always visible during task -->
+
         <div class="end-session-container">
             <button class="btn btn-end-session" onclick="confirmEndSessionDuringTask()">🛑 End Session (Save & Exit)</button>
         </div>
-        
+
         <div style="text-align: center; margin-bottom: 10px; color: #888; font-size: 0.9rem;">
             <span id="phase-badge" class="phase-badge phase-practice">PRACTICE</span><br>
-            <span id="difficulty-label">2-Back</span> | 
+            <span id="difficulty-label">2-Back</span> |
             Trial <span id="trial-counter">0</span>/<span id="total-trials">12</span>
         </div>
-        
+
         <div id="stimulus-display" class="fixation">+</div>
-        
+
         <div class="btn-grid">
             <button class="btn btn-danger btn-large" id="btn-no-match" ontouchstart="handleResponse(false)" onclick="handleResponse(false)">
                 NO MATCH<br>
@@ -508,7 +501,6 @@
         </div>
     </div>
 
-    <!-- Screen 5: Transition Screen -->
     <div id="screen-transition" class="screen center-content">
         <h1>Practice Complete!</h1>
         <div class="step-indicator">
@@ -531,7 +523,6 @@
         <button class="btn btn-success" onclick="startRealBlock()">Start Real Block (4 min)</button>
     </div>
 
-    <!-- Screen 6: Break Screen -->
     <div id="screen-break" class="screen center-content">
         <h1>Block Complete!</h1>
         <span class="phase-badge phase-break">BREAK TIME</span>
@@ -547,7 +538,7 @@
             <div class="stat-row"><span>Mean RT:</span><span id="break-rt">-</span></div>
             <div class="stat-row"><span>Trials Completed:</span><span id="break-trials">-</span></div>
         </div>
-        
+
         <div style="margin-top: 20px;">
             <p style="font-size: 0.9rem; color: #888; margin-bottom: 15px;">What would you like to do next?</p>
             <button class="btn btn-success" onclick="endBreak()">Continue to Next Block</button>
@@ -555,7 +546,6 @@
         </div>
     </div>
 
-    <!-- Screen 7: Data Submission -->
     <div id="screen-submission" class="screen center-content">
         <h1>Saving Results</h1>
         <div id="submission-status">
@@ -568,7 +558,6 @@
         <button class="btn" id="btn-new-session" style="display: none; margin-top: 20px;" onclick="clearAllDataAndRestart()">New Session</button>
     </div>
 
-    <!-- Screen 8: Session Complete -->
     <div id="screen-complete" class="screen center-content">
         <h1 style="color: #34C759;">Session Complete! 🎉</h1>
         <div class="stats-box" style="text-align: center; border: 2px solid #34C759;">
@@ -579,18 +568,13 @@
         <button class="btn btn-success" onclick="clearAllDataAndRestart()" style="margin-top: 30px;">Start New Session</button>
     </div>
 
-    <!-- Feedback Overlay -->
     <div id="feedback" class="feedback"></div>
 
-    <!-- Admin Link - Updated with your script URL -->
-    <a href="https://script.google.com/macros/s/AKfycbyilk2XzNJqLQ1qoSJv-GrDKMYNKbwTgIFMrpMZ4IWymMBkIWVubSUdl69bIXRlvYmx9Q/exec?password=nbackadmin2024" 
-       class="admin-link" 
+    <a href="https://script.google.com/macros/s/AKfycbyilk2XzNJqLQ1qoSJv-GrDKMYNKbwTgIFMrpMZ4IWymMBkIWVubSUdl69bIXRlvYmx9Q/exec?password=nbackadmin2024"
+       class="admin-link"
        target="_blank">Admin</a>
 
     <script>
-        // ==========================================
-        // CONFIGURATION - YOUR SCRIPT URL
-        // ==========================================
         const CONFIG = {
             GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyilk2XzNJqLQ1qoSJv-GrDKMYNKbwTgIFMrpMZ4IWymMBkIWVubSUdl69bIXRlvYmx9Q/exec',
             PRACTICE_TRIALS: 12,
@@ -603,9 +587,6 @@
             LETTERS: ['B', 'F', 'H', 'K', 'M', 'Q', 'R', 'X']
         };
 
-        // ==========================================
-        // STATE MANAGEMENT
-        // ==========================================
         let state = {
             participantId: '',
             sessionId: '',
@@ -629,9 +610,6 @@
             completedBlocks: []
         };
 
-        // ==========================================
-        // LOCAL STORAGE
-        // ==========================================
         function getStorageKey() {
             return `nback_recovery_${state.participantId}`;
         }
@@ -654,7 +632,7 @@
                 timestamp: Date.now()
             };
             localStorage.setItem(getStorageKey(), JSON.stringify(dataToSave));
-            
+
             const indicator = document.getElementById('auto-save-indicator');
             indicator.classList.add('visible');
             setTimeout(() => indicator.classList.remove('visible'), 1000);
@@ -672,27 +650,24 @@
             }
         }
 
-        // ==========================================
-        // SESSION MANAGEMENT
-        // ==========================================
         function checkForExistingSession() {
             const pid = document.getElementById('participant-id').value.trim();
             if (!pid) {
                 alert('Please enter a Participant ID');
                 return;
             }
-            
+
             const savedData = loadStateFromStorage(pid);
-            
+
             if (savedData && savedData.currentPhase !== 'idle') {
                 state.participantId = pid;
                 document.getElementById('recovery-pid').textContent = pid;
-                
+
                 let details = `Session ID: ${savedData.sessionId.substr(-6)}<br>`;
                 details += `Last saved: ${new Date(savedData.timestamp).toLocaleTimeString()}<br>`;
                 details += `Block: ${savedData.blockNumber}, Phase: ${savedData.currentPhase}<br>`;
                 details += `Completed trials: ${savedData.currentBlockData.length}`;
-                
+
                 document.getElementById('recovery-details').innerHTML = details;
                 showScreen('screen-recovery');
             } else {
@@ -706,15 +681,15 @@
                 startFreshSession();
                 return;
             }
-            
+
             Object.assign(state, savedData);
-            
+
             if (state.currentPhase === 'practice' || state.currentPhase === 'real') {
                 document.getElementById('phase-badge').textContent = state.isPractice ? 'PRACTICE' : 'BLOCK ' + state.blockNumber;
                 document.getElementById('phase-badge').className = state.isPractice ? 'phase-badge phase-practice' : 'phase-badge phase-real';
                 document.getElementById('difficulty-label').textContent = state.currentDifficulty + '-Back';
                 document.getElementById('total-trials').textContent = state.isPractice ? CONFIG.PRACTICE_TRIALS : CONFIG.REAL_TRIALS;
-                
+
                 showScreen('screen-task');
                 updateTimer();
                 runTrialLoop();
@@ -742,7 +717,7 @@
             state.currentBlockData = [];
             state.currentPhase = 'idle';
             state.completedBlocks = [];
-            
+
             showScreen('screen-difficulty');
             updateCompletedBlocksDisplay();
         }
@@ -766,9 +741,6 @@
             location.reload();
         }
 
-        // ==========================================
-        // TASK FLOW
-        // ==========================================
         function startPracticePhase(n) {
             state.currentDifficulty = n;
             state.currentPhase = 'practice_prep';
@@ -783,16 +755,16 @@
             state.currentBlockData = [];
             state.currentTrial = 0;
             state.blockStartTime = Date.now();
-            
+
             const seqData = generateSequence(state.currentDifficulty, CONFIG.PRACTICE_TRIALS);
             state.sequence = seqData.sequence;
             state.isTarget = seqData.isTarget;
-            
+
             document.getElementById('phase-badge').textContent = 'PRACTICE';
             document.getElementById('phase-badge').className = 'phase-badge phase-practice';
             document.getElementById('difficulty-label').textContent = state.currentDifficulty + '-Back';
             document.getElementById('total-trials').textContent = CONFIG.PRACTICE_TRIALS;
-            
+
             saveStateToStorage();
             showScreen('screen-task');
             updateTimer();
@@ -806,9 +778,9 @@
         function showTransitionScreen() {
             state.currentPhase = 'transition';
             saveStateToStorage();
-            
+
             document.getElementById('transition-difficulty').textContent = state.currentDifficulty + '-Back';
-            
+
             if (state.isPractice && state.currentBlockData.length > 0) {
                 const accuracy = calculateBlockAccuracy();
                 const meanRT = calculateMeanRT();
@@ -818,7 +790,7 @@
                 document.getElementById('transition-accuracy').textContent = 'Skipped';
                 document.getElementById('transition-rt').textContent = 'N/A';
             }
-            
+
             showScreen('screen-transition');
         }
 
@@ -829,70 +801,59 @@
             state.currentBlockData = [];
             state.currentTrial = 0;
             state.blockStartTime = Date.now();
-            
+
             const seqData = generateSequence(state.currentDifficulty, CONFIG.REAL_TRIALS);
             state.sequence = seqData.sequence;
             state.isTarget = seqData.isTarget;
-            
+
             document.getElementById('phase-badge').textContent = 'BLOCK ' + state.blockNumber;
             document.getElementById('phase-badge').className = 'phase-badge phase-real';
             document.getElementById('difficulty-label').textContent = state.currentDifficulty + '-Back';
             document.getElementById('total-trials').textContent = CONFIG.REAL_TRIALS;
-            
+
             saveStateToStorage();
             showScreen('screen-task');
             updateTimer();
             runTrialLoop();
         }
 
-        // ==========================================
-        // END SESSION DURING TASK (NEW FEATURE)
-        // ==========================================
         function confirmEndSessionDuringTask() {
             if (confirm('Are you sure you want to end this session?\n\nCurrent progress will be saved and emailed.')) {
-                // Stop all timers
                 state.timeoutIds.forEach(id => clearTimeout(id));
                 state.timeoutIds = [];
-                
-                // Mark session as finished
+
                 state.currentPhase = 'finished';
-                
-                // If we have collected any data in this block, save it
+
                 if (state.currentBlockData.length > 0) {
-                    // Add metadata that session was ended early
                     state.currentBlockData.forEach(trial => {
                         trial.session_ended_early = true;
                     });
-                    
+
                     saveDataLocally();
-                    submitBlockData(true); // true = session finished
+                    submitBlockData(true);
                 } else {
-                    // No data collected, just show complete screen
                     showScreen('screen-complete');
                     clearStorage();
                 }
             }
         }
 
-        // ==========================================
-        // SEQUENCE GENERATION (2-4 only)
-        // ==========================================
         function generateSequence(n, length) {
             const seq = [];
             const targets = [];
-            
+
             for (let i = 0; i < n; i++) {
                 seq.push(CONFIG.LETTERS[Math.floor(Math.random() * CONFIG.LETTERS.length)]);
                 targets.push(false);
             }
-            
+
             let targetCount = 0;
             const targetGoal = Math.floor((length - n) * CONFIG.TARGET_PROBABILITY);
-            
+
             for (let i = n; i < length; i++) {
                 const shouldBeTarget = (targetCount < targetGoal) && (Math.random() < 0.5);
-                
-                if (shouldBeTarget && !targets[i-1]) {
+
+                if (shouldBeTarget && !targets[i - 1]) {
                     seq.push(seq[i - n]);
                     targets.push(true);
                     targetCount++;
@@ -905,27 +866,24 @@
                     targets.push(false);
                 }
             }
-            
+
             return { sequence: seq, isTarget: targets };
         }
 
-        // ==========================================
-        // TIMER & TRIALS
-        // ==========================================
         function updateTimer() {
             if (!document.getElementById('screen-task').classList.contains('active')) return;
-            
+
             const elapsed = Date.now() - state.blockStartTime;
-            const totalDuration = state.isPractice ? 
-                (CONFIG.PRACTICE_TRIALS * CONFIG.TRIAL_DURATION) : 
+            const totalDuration = state.isPractice ?
+                (CONFIG.PRACTICE_TRIALS * CONFIG.TRIAL_DURATION) :
                 (CONFIG.REAL_TRIALS * CONFIG.TRIAL_DURATION);
             const remaining = Math.max(0, totalDuration - elapsed);
-            
+
             const minutes = Math.floor(remaining / 60000);
             const seconds = Math.floor((remaining % 60000) / 1000);
-            document.getElementById('timer-display').textContent = 
+            document.getElementById('timer-display').textContent =
                 `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            
+
             if (remaining > 0) {
                 requestAnimationFrame(updateTimer);
             }
@@ -936,31 +894,31 @@
                 endBlock();
                 return;
             }
-            
+
             const trialIndex = state.currentTrial;
             const totalTrials = state.isPractice ? CONFIG.PRACTICE_TRIALS : CONFIG.REAL_TRIALS;
-            
+
             document.getElementById('trial-counter').textContent = trialIndex + 1;
             document.getElementById('progress-bar').style.width = ((trialIndex / totalTrials) * 100) + '%';
-            
+
             state.canRespond = false;
             state.responded = false;
             state.trialStartTime = Date.now();
-            
+
             const display = document.getElementById('stimulus-display');
-            
+
             display.textContent = '+';
             display.className = 'fixation';
-            
+
             state.timeoutIds.push(setTimeout(() => {
                 display.textContent = state.sequence[trialIndex];
                 display.className = '';
                 state.stimulusOnsetTime = Date.now();
                 state.canRespond = true;
-                
+
                 state.timeoutIds.push(setTimeout(() => {
                     display.textContent = '';
-                    
+
                     state.timeoutIds.push(setTimeout(() => {
                         if (!state.responded) {
                             recordTrial(null);
@@ -970,19 +928,19 @@
                         saveStateToStorage();
                         runTrialLoop();
                     }, CONFIG.RESPONSE_WINDOW));
-                    
+
                 }, CONFIG.STIMULUS_DURATION));
-                
+
             }, CONFIG.FIXATION_DURATION));
         }
 
         function handleResponse(isMatch) {
             if (!state.canRespond || state.responded) return;
-            
+
             state.responded = true;
             const rt = Date.now() - state.stimulusOnsetTime;
             recordTrial(isMatch, rt);
-            
+
             if (state.isPractice) {
                 const correct = (isMatch === state.isTarget[state.currentTrial]);
                 showFeedback(correct);
@@ -993,7 +951,7 @@
             const fb = document.getElementById('feedback');
             fb.textContent = correct ? '✓ Correct' : '✗ Wrong';
             fb.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
-            
+
             setTimeout(() => {
                 fb.className = 'feedback';
             }, 500);
@@ -1003,12 +961,12 @@
             const trialIdx = state.currentTrial;
             const isTarget = state.isTarget[trialIdx];
             const correctResponse = isTarget;
-            
+
             let accuracy = null;
             if (response !== null) {
                 accuracy = (response === correctResponse) ? 1 : 0;
             }
-            
+
             const trialData = {
                 participant_id: state.participantId,
                 session_id: state.sessionId,
@@ -1030,7 +988,7 @@
                 screen_width: window.screen.width,
                 screen_height: window.screen.height
             };
-            
+
             state.currentBlockData.push(trialData);
         }
 
@@ -1042,13 +1000,10 @@
             return 'Unknown';
         }
 
-        // ==========================================
-        // BLOCK END & BREAK
-        // ==========================================
         function endBlock() {
             state.timeoutIds.forEach(id => clearTimeout(id));
             state.timeoutIds = [];
-            
+
             if (state.isPractice) {
                 showTransitionScreen();
             } else {
@@ -1075,77 +1030,74 @@
         function showBreakScreen() {
             state.currentPhase = 'break';
             state.breakStartTime = Date.now();
-            
+
             state.completedBlocks.push({
                 blockNumber: state.blockNumber,
                 difficulty: state.currentDifficulty,
                 accuracy: calculateBlockAccuracy()
             });
-            
+
             saveStateToStorage();
-            
+
             const accuracy = calculateBlockAccuracy();
             const meanRT = calculateMeanRT();
-            
+
             document.getElementById('break-block-num').textContent = state.blockNumber;
             document.getElementById('break-difficulty').textContent = state.currentDifficulty + '-Back';
             document.getElementById('break-accuracy').textContent = (accuracy * 100).toFixed(1) + '%';
             document.getElementById('break-rt').textContent = Math.round(meanRT) + ' ms';
             document.getElementById('break-trials').textContent = state.currentBlockData.length;
-            
+
             updateBreakTimer();
             showScreen('screen-break');
         }
 
         function updateBreakTimer() {
             if (!document.getElementById('screen-break').classList.contains('active')) return;
-            
+
             state.breakDuration = Date.now() - state.breakStartTime;
             const minutes = Math.floor(state.breakDuration / 60000);
             const seconds = Math.floor((state.breakDuration % 60000) / 1000);
-            
-            document.getElementById('break-timer').textContent = 
+
+            document.getElementById('break-timer').textContent =
                 `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            
+
             requestAnimationFrame(updateBreakTimer);
         }
 
         function endBreak() {
             const breakDurationSec = Math.round(state.breakDuration / 1000);
-            
+
             if (state.currentBlockData.length > 0) {
                 state.currentBlockData[state.currentBlockData.length - 1].break_duration_sec = breakDurationSec;
                 state.currentBlockData[state.currentBlockData.length - 1].break_start_time = new Date(state.breakStartTime).toISOString();
                 state.currentBlockData[state.currentBlockData.length - 1].break_end_time = new Date().toISOString();
             }
-            
+
             submitBlockData();
-            
+
             state.currentPhase = 'idle';
             state.currentBlockData = [];
             state.currentTrial = 0;
             saveStateToStorage();
-            
+
             showScreen('screen-difficulty');
             updateCompletedBlocksDisplay();
         }
 
         function finishSession() {
             const breakDurationSec = Math.round(state.breakDuration / 1000);
-            
+
             if (state.currentBlockData.length > 0) {
                 state.currentBlockData[state.currentBlockData.length - 1].break_duration_sec = breakDurationSec;
                 state.currentBlockData[state.currentBlockData.length - 1].break_start_time = new Date(state.breakStartTime).toISOString();
                 state.currentBlockData[state.currentBlockData.length - 1].break_end_time = new Date().toISOString();
                 state.currentBlockData[state.currentBlockData.length - 1].session_finished = true;
             }
-            
+
             submitBlockData(true);
         }
 
-        // ==========================================
-        // DATA SUBMISSION
-        // ==========================================
         function saveDataLocally() {
             const key = `nback_backup_${state.sessionId}_block${state.blockNumber}`;
             localStorage.setItem(key, JSON.stringify(state.currentBlockData));
@@ -1158,7 +1110,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `nback_${state.participantId}_block${state.blockNumber}_${new Date().toISOString().slice(0,10)}.csv`;
+            a.download = `nback_${state.participantId}_block${state.blockNumber}_${new Date().toISOString().slice(0, 10)}.csv`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1168,10 +1120,11 @@
         function convertToCSV(data) {
             if (data.length === 0) return '';
             const headers = Object.keys(data[0]);
-            const rows = data.map(row => 
+            const rows = data.map(row =>
                 headers.map(h => {
                     let val = row[h];
-                    if (typeof val === 'string' && (val.includes(',') || val.includes('"'))) {
+                    if (val === null || val === undefined) val = '';
+                    if (typeof val === 'string' && (val.includes(',') || val.includes('"') || val.includes('\n'))) {
                         val = '"' + val.replace(/"/g, '""') + '"';
                     }
                     return val;
@@ -1183,12 +1136,13 @@
         async function submitBlockData(sessionFinished = false) {
             const statusDiv = document.getElementById('submission-status');
             const resultDiv = document.getElementById('submission-result');
-            
+            const newSessionBtn = document.getElementById('btn-new-session');
+
             showScreen('screen-submission');
             statusDiv.style.display = 'block';
             resultDiv.style.display = 'none';
-            
-            // ÖNCE blockStats hazırla
+            newSessionBtn.style.display = 'none';
+
             const blockStats = {
                 participant_id: state.participantId,
                 session_id: state.sessionId,
@@ -1203,33 +1157,36 @@
                 timestamp: new Date().toISOString(),
                 trials: state.currentBlockData
             };
-            
-            // 10 saniye timeout ekle
+
+            console.log('Submitting blockStats:', blockStats);
+
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
-            
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
+
             try {
                 const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'text/plain;charset=utf-8'
                     },
                     body: JSON.stringify(blockStats),
                     signal: controller.signal
                 });
-                
+
                 clearTimeout(timeoutId);
-                
+                console.log('Response object:', response);
+
                 if (!response.ok) {
                     throw new Error('HTTP error: ' + response.status);
                 }
-                
+
                 const result = await response.json();
-                
+                console.log('Server result:', result);
+
                 if (result.success) {
                     if (sessionFinished) {
                         showScreen('screen-complete');
-                        document.getElementById('final-summary').innerHTML = 
+                        document.getElementById('final-summary').innerHTML =
                             `Completed ${state.completedBlocks.length} blocks<br>` +
                             state.completedBlocks.map(b => `Block ${b.blockNumber}: ${b.difficulty}-Back`).join('<br>');
                         clearStorage();
@@ -1246,46 +1203,43 @@
                                 </p>
                             </div>
                         `;
-                        document.getElementById('btn-new-session').style.display = 'block';
+                        newSessionBtn.style.display = 'block';
                     }
                 } else {
                     throw new Error(result.error || 'Server reported failure');
                 }
+
             } catch (error) {
                 clearTimeout(timeoutId);
                 console.error('Submission error:', error);
-                
+
                 statusDiv.style.display = 'none';
                 resultDiv.style.display = 'block';
                 resultDiv.innerHTML = `
                     <div class="stats-box">
                         <h3 class="warning">⚠ Connection Issue</h3>
-                        <p>Could not connect to server, but your data is safe!</p>
+                        <p>Could not connect to server, but your data is safe.</p>
                         <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">
                             Error: ${error.message}<br>
-                            CSV file downloaded to your device.
+                            CSV file downloaded to your device and local backup is stored.
                         </p>
                     </div>
                 `;
-                document.getElementById('btn-new-session').style.display = 'block';
-                
+                newSessionBtn.style.display = 'block';
+
                 if (sessionFinished) {
                     clearStorage();
                 }
             }
         }
 
-        // ==========================================
-        // UTILITIES
-        // ==========================================
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
         }
 
-        // Mobile optimizations
         let lastTouchEnd = 0;
-        document.addEventListener('touchend', function (event) {
+        document.addEventListener('touchend', function(event) {
             const now = (new Date()).getTime();
             if (now - lastTouchEnd <= 300) {
                 event.preventDefault();
@@ -1294,12 +1248,13 @@
         }, false);
 
         document.body.addEventListener('touchmove', function(e) {
-            if (e.target.closest('.screen') && document.querySelector('.screen.active').scrollHeight <= document.querySelector('.screen.active').clientHeight) {
+            const activeScreen = document.querySelector('.screen.active');
+            if (activeScreen && activeScreen.scrollHeight <= activeScreen.clientHeight) {
                 e.preventDefault();
             }
         }, { passive: false });
 
-        window.addEventListener('beforeunload', function (e) {
+        window.addEventListener('beforeunload', function(e) {
             if (state.currentPhase === 'practice' || state.currentPhase === 'real') {
                 e.preventDefault();
                 e.returnValue = 'You are in the middle of a block. Data is auto-saved.';
