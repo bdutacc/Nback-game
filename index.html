@@ -114,6 +114,12 @@
             color: #000;
         }
         
+        .btn-finish {
+            background: #FF3B30;
+            margin-top: 20px;
+            border: 2px solid #fff;
+        }
+        
         .btn-skip {
             background: #666;
             font-size: 1rem;
@@ -323,6 +329,14 @@
             color: #fff;
         }
         
+        .difficulty-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            max-width: 400px;
+            width: 100%;
+        }
+        
         .recovery-box {
             background: #2a2a2a;
             border: 2px solid #FF9500;
@@ -347,6 +361,15 @@
         
         .auto-save-indicator.visible {
             display: block;
+        }
+        
+        .finished-badge {
+            background: #34C759;
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            margin-left: 10px;
         }
     </style>
 </head>
@@ -397,23 +420,27 @@
             <div class="step-dot"></div>
             <div class="step-dot"></div>
         </div>
-        <p class="step-label">Step 2: Choose Level</p>
+        <p class="step-label">Step 2: Choose N-Back Level (1-4)</p>
         <p>Choose the n-back level for the next block:</p>
-        <div style="max-width: 400px; width: 100%;">
+        <div class="difficulty-grid">
+            <button class="btn btn-secondary" onclick="startPracticePhase(1)">
+                1-Back<br>
+                <small style="font-weight: normal; opacity: 0.8;">Match previous letter</small>
+            </button>
             <button class="btn btn-secondary" onclick="startPracticePhase(2)">
                 2-Back<br>
-                <small style="font-weight: normal; opacity: 0.8;">Match letter from 2 trials ago</small>
+                <small style="font-weight: normal; opacity: 0.8;">2 trials ago</small>
             </button>
             <button class="btn btn-secondary" onclick="startPracticePhase(3)">
                 3-Back<br>
-                <small style="font-weight: normal; opacity: 0.8;">Match letter from 3 trials ago</small>
+                <small style="font-weight: normal; opacity: 0.8;">3 trials ago</small>
             </button>
             <button class="btn btn-secondary" onclick="startPracticePhase(4)">
                 4-Back<br>
-                <small style="font-weight: normal; opacity: 0.8;">Match letter from 4 trials ago</small>
+                <small style="font-weight: normal; opacity: 0.8;">4 trials ago</small>
             </button>
         </div>
-        <div id="block-info" style="margin-top: 20px; font-size: 0.9rem; color: #aaa;"></div>
+        <div id="completed-blocks" style="margin-top: 20px; font-size: 0.9rem; color: #aaa;"></div>
     </div>
 
     <!-- Screen 3: Practice Instructions -->
@@ -498,13 +525,17 @@
         <div class="stats-box">
             <h3>Block Summary</h3>
             <div class="stat-row"><span>Block Number:</span><span id="break-block-num">-</span></div>
-            <div class="stat-row"><span>Difficulty:</span><span id="break-difficulty">-</span></div>
+            <div class="stat-row"><span>Difficulty Level:</span><span id="break-difficulty" style="color: #007AFF; font-weight: bold;">-</span></div>
             <div class="stat-row"><span>Accuracy:</span><span id="break-accuracy">-</span></div>
             <div class="stat-row"><span>Mean RT:</span><span id="break-rt">-</span></div>
-            <div class="stat-row"><span>Trials:</span><span id="break-trials">-</span></div>
+            <div class="stat-row"><span>Trials Completed:</span><span id="break-trials">-</span></div>
         </div>
-        <p>Take a break. When ready, continue to the next block.</p>
-        <button class="btn btn-success" onclick="endBreak()">Continue to Next Block</button>
+        
+        <div style="margin-top: 20px;">
+            <p style="font-size: 0.9rem; color: #888; margin-bottom: 15px;">What would you like to do next?</p>
+            <button class="btn btn-success" onclick="endBreak()">Continue to Next Block</button>
+            <button class="btn btn-finish" onclick="finishSession()">Finish Session</button>
+        </div>
     </div>
 
     <!-- Screen 7: Data Submission -->
@@ -520,6 +551,17 @@
         <button class="btn" id="btn-new-session" style="display: none; margin-top: 20px;" onclick="clearAllDataAndRestart()">New Session</button>
     </div>
 
+    <!-- Screen 8: Session Complete -->
+    <div id="screen-complete" class="screen center-content">
+        <h1 style="color: #34C759;">Session Complete! 🎉</h1>
+        <div class="stats-box" style="text-align: center; border: 2px solid #34C759;">
+            <h3>All Data Saved</h3>
+            <p style="font-size: 0.9rem; color: #aaa;">Thank you for participating!</p>
+            <p id="final-summary" style="font-size: 0.85rem; margin-top: 15px;"></p>
+        </div>
+        <button class="btn btn-success" onclick="clearAllDataAndRestart()" style="margin-top: 30px;">Start New Session</button>
+    </div>
+
     <!-- Feedback Overlay -->
     <div id="feedback" class="feedback"></div>
 
@@ -530,7 +572,7 @@
         // CONFIGURATION
         // ==========================================
         const CONFIG = {
-            GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwvQrEHGVvcelZgcU5vT6xCZiYOXJf2OS_o5tu8f5rn1g1pjC4_znMLiT5pibXQTsq0ag/exec',
+            GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec',
             PRACTICE_TRIALS: 12,
             REAL_TRIALS: 120,
             TRIAL_DURATION: 2000,
@@ -563,7 +605,8 @@
             blockStartTime: 0,
             breakStartTime: 0,
             breakDuration: 0,
-            currentPhase: 'idle' // idle, practice, real, break
+            currentPhase: 'idle',
+            completedBlocks: [] // Track completed blocks with their difficulties
         };
 
         // ==========================================
@@ -587,11 +630,11 @@
                 isTarget: state.isTarget,
                 blockStartTime: state.blockStartTime,
                 currentPhase: state.currentPhase,
+                completedBlocks: state.completedBlocks,
                 timestamp: Date.now()
             };
             localStorage.setItem(getStorageKey(), JSON.stringify(dataToSave));
             
-            // Show auto-save indicator
             const indicator = document.getElementById('auto-save-indicator');
             indicator.classList.add('visible');
             setTimeout(() => indicator.classList.remove('visible'), 1000);
@@ -607,11 +650,9 @@
         }
 
         function clearStorage() {
-            // Clear only this participant's data
             if (state.participantId) {
                 localStorage.removeItem(getStorageKey());
             }
-            // Also clear any old format data
             for (let i = localStorage.length - 1; i >= 0; i--) {
                 const key = localStorage.key(i);
                 if (key && key.startsWith('nback_')) {
@@ -633,7 +674,6 @@
             const savedData = loadStateFromStorage(pid);
             
             if (savedData && savedData.currentPhase !== 'idle') {
-                // Show recovery screen
                 state.participantId = pid;
                 document.getElementById('recovery-pid').textContent = pid;
                 
@@ -656,7 +696,6 @@
                 return;
             }
             
-            // Restore state
             state.participantId = savedData.participantId;
             state.sessionId = savedData.sessionId;
             state.blockNumber = savedData.blockNumber;
@@ -669,10 +708,9 @@
             state.isTarget = savedData.isTarget || [];
             state.blockStartTime = savedData.blockStartTime || Date.now();
             state.currentPhase = savedData.currentPhase || 'idle';
+            state.completedBlocks = savedData.completedBlocks || [];
             
-            // Navigate to appropriate screen
             if (state.currentPhase === 'practice' || state.currentPhase === 'real') {
-                // Resume task
                 document.getElementById('phase-badge').textContent = state.isPractice ? 'PRACTICE' : 'BLOCK ' + state.blockNumber;
                 document.getElementById('phase-badge').className = state.isPractice ? 'phase-badge phase-practice' : 'phase-badge phase-real';
                 document.getElementById('difficulty-label').textContent = state.currentDifficulty + '-Back';
@@ -685,7 +723,7 @@
                 showBreakScreen();
             } else {
                 showScreen('screen-difficulty');
-                updateBlockInfo();
+                updateCompletedBlocksDisplay();
             }
         }
 
@@ -704,56 +742,29 @@
             state.globalTrialNumber = 0;
             state.currentBlockData = [];
             state.currentPhase = 'idle';
+            state.completedBlocks = [];
             
             showScreen('screen-difficulty');
-            updateBlockInfo();
+            updateCompletedBlocksDisplay();
+        }
+
+        function updateCompletedBlocksDisplay() {
+            const div = document.getElementById('completed-blocks');
+            if (state.completedBlocks.length === 0) {
+                div.innerHTML = 'No blocks completed yet';
+            } else {
+                let html = 'Completed blocks: ';
+                state.completedBlocks.forEach((block, idx) => {
+                    html += `<span style="color: #34C759;">${block.difficulty}-Back</span>`;
+                    if (idx < state.completedBlocks.length - 1) html += ', ';
+                });
+                div.innerHTML = html;
+            }
         }
 
         function clearAllDataAndRestart() {
             clearStorage();
             location.reload();
-        }
-
-        // ==========================================
-        // INITIALIZATION & UTILITIES
-        // ==========================================
-        function updateBlockInfo() {
-            document.getElementById('block-info').innerHTML = 
-                `Participant: <strong>${state.participantId}</strong><br>
-                 Session: ${state.sessionId.substr(-6)}<br>
-                 Completed Blocks: ${state.blockNumber}`;
-        }
-
-        function generateSequence(n, length) {
-            const seq = [];
-            const targets = [];
-            
-            for (let i = 0; i < n; i++) {
-                seq.push(CONFIG.LETTERS[Math.floor(Math.random() * CONFIG.LETTERS.length)]);
-                targets.push(false);
-            }
-            
-            let targetCount = 0;
-            const targetGoal = Math.floor((length - n) * CONFIG.TARGET_PROBABILITY);
-            
-            for (let i = n; i < length; i++) {
-                const shouldBeTarget = (targetCount < targetGoal) && (Math.random() < 0.5);
-                
-                if (shouldBeTarget && !targets[i-1]) {
-                    seq.push(seq[i - n]);
-                    targets.push(true);
-                    targetCount++;
-                } else {
-                    let letter;
-                    do {
-                        letter = CONFIG.LETTERS[Math.floor(Math.random() * CONFIG.LETTERS.length)];
-                    } while (letter === seq[i - n]);
-                    seq.push(letter);
-                    targets.push(false);
-                }
-            }
-            
-            return { sequence: seq, isTarget: targets };
         }
 
         // ==========================================
@@ -839,6 +850,42 @@
         }
 
         // ==========================================
+        // SEQUENCE GENERATION (Supports 1-4)
+        // ==========================================
+        function generateSequence(n, length) {
+            const seq = [];
+            const targets = [];
+            
+            // First n trials: never targets
+            for (let i = 0; i < n; i++) {
+                seq.push(CONFIG.LETTERS[Math.floor(Math.random() * CONFIG.LETTERS.length)]);
+                targets.push(false);
+            }
+            
+            let targetCount = 0;
+            const targetGoal = Math.floor((length - n) * CONFIG.TARGET_PROBABILITY);
+            
+            for (let i = n; i < length; i++) {
+                const shouldBeTarget = (targetCount < targetGoal) && (Math.random() < 0.5);
+                
+                if (shouldBeTarget && !targets[i-1]) {
+                    seq.push(seq[i - n]);
+                    targets.push(true);
+                    targetCount++;
+                } else {
+                    let letter;
+                    do {
+                        letter = CONFIG.LETTERS[Math.floor(Math.random() * CONFIG.LETTERS.length)];
+                    } while (letter === seq[i - n]);
+                    seq.push(letter);
+                    targets.push(false);
+                }
+            }
+            
+            return { sequence: seq, isTarget: targets };
+        }
+
+        // ==========================================
         // TIMER
         // ==========================================
         function updateTimer() {
@@ -899,10 +946,7 @@
                         }
                         state.currentTrial++;
                         state.globalTrialNumber++;
-                        
-                        // AUTO-SAVE AFTER EVERY TRIAL
                         saveStateToStorage();
-                        
                         runTrialLoop();
                     }, CONFIG.RESPONSE_WINDOW));
                     
@@ -1010,6 +1054,14 @@
         function showBreakScreen() {
             state.currentPhase = 'break';
             state.breakStartTime = Date.now();
+            
+            // Record completed block
+            state.completedBlocks.push({
+                blockNumber: state.blockNumber,
+                difficulty: state.currentDifficulty,
+                accuracy: calculateBlockAccuracy()
+            });
+            
             saveStateToStorage();
             
             const accuracy = calculateBlockAccuracy();
@@ -1049,14 +1101,26 @@
             
             submitBlockData();
             
-            // Reset for next block but keep participant ID
             state.currentPhase = 'idle';
             state.currentBlockData = [];
             state.currentTrial = 0;
             saveStateToStorage();
             
             showScreen('screen-difficulty');
-            updateBlockInfo();
+            updateCompletedBlocksDisplay();
+        }
+
+        function finishSession() {
+            const breakDurationSec = Math.round(state.breakDuration / 1000);
+            
+            if (state.currentBlockData.length > 0) {
+                state.currentBlockData[state.currentBlockData.length - 1].break_duration_sec = breakDurationSec;
+                state.currentBlockData[state.currentBlockData.length - 1].break_start_time = new Date(state.breakStartTime).toISOString();
+                state.currentBlockData[state.currentBlockData.length - 1].break_end_time = new Date().toISOString();
+                state.currentBlockData[state.currentBlockData.length - 1].session_finished = true;
+            }
+            
+            submitBlockData(true); // true = session is finished
         }
 
         // ==========================================
@@ -1096,13 +1160,11 @@
             return [headers.join(','), ...rows].join('\n');
         }
 
-        async function submitBlockData() {
+        async function submitBlockData(sessionFinished = false) {
             const statusDiv = document.getElementById('submission-status');
             const resultDiv = document.getElementById('submission-result');
             
-            if (!document.querySelector('.screen.active').id.includes('difficulty')) {
-                showScreen('screen-submission');
-            }
+            showScreen('screen-submission');
             
             const blockStats = {
                 participant_id: state.participantId,
@@ -1114,6 +1176,7 @@
                 accuracy: calculateBlockAccuracy(),
                 mean_rt: calculateMeanRT(),
                 break_duration_sec: state.currentBlockData[state.currentBlockData.length - 1]?.break_duration_sec || 0,
+                session_finished: sessionFinished,
                 timestamp: new Date().toISOString(),
                 trials: state.currentBlockData
             };
@@ -1130,38 +1193,47 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    statusDiv.style.display = 'none';
-                    resultDiv.style.display = 'block';
-                    resultDiv.innerHTML = `
-                        <div class="stats-box">
-                            <h3 class="success">✓ Data Saved Successfully</h3>
-                            <p>Block ${state.blockNumber} results have been emailed.</p>
-                            <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">
-                                Break duration: ${blockStats.break_duration_sec} seconds<br>
-                                Backup CSV was also downloaded to your device.
-                            </p>
-                        </div>
-                    `;
+                    if (sessionFinished) {
+                        showScreen('screen-complete');
+                        document.getElementById('final-summary').innerHTML = 
+                            `Completed ${state.completedBlocks.length} blocks<br>` +
+                            state.completedBlocks.map(b => `Block ${b.blockNumber}: ${b.difficulty}-Back`).join('<br>');
+                        clearStorage();
+                    } else {
+                        statusDiv.style.display = 'none';
+                        resultDiv.style.display = 'block';
+                        resultDiv.innerHTML = `
+                            <div class="stats-box">
+                                <h3 class="success">✓ Data Saved Successfully</h3>
+                                <p>Block ${state.blockNumber} results have been emailed.</p>
+                                <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">
+                                    Break duration: ${blockStats.break_duration_sec} seconds<br>
+                                    Backup CSV was also downloaded to your device.
+                                </p>
+                            </div>
+                        `;
+                        document.getElementById('btn-new-session').style.display = 'block';
+                    }
                 } else {
                     throw new Error('Server reported failure');
                 }
             } catch (error) {
                 console.error('Submission error:', error);
-                statusDiv.style.display = 'none';
-                resultDiv.style.display = 'block';
-                resultDiv.innerHTML = `
-                    <div class="stats-box">
-                        <h3 class="warning">⚠ Submission Failed</h3>
-                        <p>Data is saved locally and CSV was downloaded.</p>
-                        <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">
-                            Break duration: ${blockStats.break_duration_sec} seconds<br>
-                            Error: ${error.message}
-                        </p>
-                    </div>
-                `;
+                if (!sessionFinished) {
+                    statusDiv.style.display = 'none';
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `
+                        <div class="stats-box">
+                            <h3 class="warning">⚠ Submission Failed</h3>
+                            <p>Data is saved locally and CSV was downloaded.</p>
+                            <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">
+                                Error: ${error.message}
+                            </p>
+                        </div>
+                    `;
+                    document.getElementById('btn-new-session').style.display = 'block';
+                }
             }
-            
-            document.getElementById('btn-new-session').style.display = 'block';
         }
 
         // ==========================================
@@ -1245,11 +1317,10 @@
             }
         }, { passive: false });
 
-        // Warn before refresh/close if in middle of task
         window.addEventListener('beforeunload', function (e) {
             if (state.currentPhase === 'practice' || state.currentPhase === 'real') {
                 e.preventDefault();
-                e.returnValue = 'You are in the middle of a block. Data is auto-saved, but please use the app controls to navigate.';
+                e.returnValue = 'You are in the middle of a block. Data is auto-saved.';
             }
         });
     </script>
